@@ -1,0 +1,65 @@
+[project]
+name = "handovers-backend"
+version = "0.1.0"
+description = "Handovers backend: FastAPI + LangGraph over FalkorDB agent memory."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+license = "MIT"
+dependencies = [
+    "fastapi[standard]>=0.115",
+    "falkordb>=1.7",
+    "pydantic>=2.9",
+    "pydantic-settings>=2.6",
+    "structlog>=24.4",
+    "httpx>=0.28.1",
+    "markitdown[docx,pdf,pptx,xlsx]>=0.1.8",
+    "pandas>=3.0.6",
+    "openpyxl>=3.1.5",
+    "rapidfuzz>=3.14.6",
+    "cryptography>=43",
+    "pyjwt[crypto]>=2.9",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "ruff>=0.8",
+    "mypy>=1.13",
+    # Bundled FalkorDB server for scripts/falkordb-local.sh; redislite does not support Windows.
+    "falkordblite>=0.10.0; sys_platform != 'win32'",
+    "python-docx>=1.2.0",
+]
+
+[tool.uv]
+# An application, not a library: dependencies only, nothing to build or install.
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+markers = [
+    "integration: needs a running FalkorDB (docker compose up -d falkordb)",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["."]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF", "ASYNC"]
+# The formatter owns line width; long user-facing strings are allowed.
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.12"
+files = ["main.py", "core", "api", "services", "ingestion", "connectors", "identity", "seed"]
+strict = true
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+module = ["falkordb", "falkordb.*", "redis", "redis.*", "pandas", "pandas.*", "markitdown", "markitdown.*", "redislite", "redislite.*", "docx", "docx.*", "openpyxl", "openpyxl.*"]
+ignore_missing_imports = true
