@@ -1,0 +1,14 @@
+# Root build context (used by the frontend image). Keep it small.
+**/node_modules
+**/.venv
+**/dist
+**/__pycache__
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+.git
+.env
+docs
+**/tests
+**/.env
+graph/benchmark/results

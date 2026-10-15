@@ -1,0 +1,17 @@
+# Same bytes on every OS: text is stored and checked out with LF line endings, whatever each
+# developer's core.autocrlf says. Shell scripts with CRLF break on macOS/Linux and in containers;
+# Windows tools (PowerShell, VS Code, Docker, Python, Node) all read LF fine.
+* text=auto eol=lf
+
+# Binary files: never touch line endings or diff them as text.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.pdf binary
+*.docx binary
+*.xlsx binary
+*.pptx binary
+*.zip binary
