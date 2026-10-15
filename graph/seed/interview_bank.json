@@ -1,0 +1,132 @@
+{
+  "skill:python": {
+    "question": "Walk me through a Python service you've run in production. What broke, and how did you find out?",
+    "listen_for": ["Specific incident and how it was detected", "Testing and deployment habits", "Mentions monitoring or logs"],
+    "red_flags": ["Only tutorials or coursework", "Can't name a production problem they fixed"]
+  },
+  "skill:fastapi": {
+    "question": "How have you structured a FastAPI (or similar) API so it stays fast and easy to change?",
+    "listen_for": ["Validation with typed models", "Async vs sync trade-offs", "Pagination or idempotency"],
+    "red_flags": ["Only CRUD demos", "No idea how requests are validated"]
+  },
+  "skill:postgresql": {
+    "question": "Tell me about a slow query or a locking problem you fixed in PostgreSQL. How did you approach it?",
+    "listen_for": ["EXPLAIN or query plans", "Indexes or locks", "Measured before and after"],
+    "red_flags": ["Only uses an ORM, never looked at SQL", "Fixes by guessing"]
+  },
+  "skill:alembic": {
+    "question": "How do you run a database migration on a busy production table without downtime?",
+    "listen_for": ["Low-traffic windows or batched backfills", "Avoiding long locks", "Rollback plan"],
+    "red_flags": ["Runs migrations straight on production with no plan", "Never had to think about locks"]
+  },
+  "skill:rest-apis": {
+    "question": "Describe a third-party API integration you owned. How did you handle failures and retries?",
+    "listen_for": ["Retries with backoff", "Idempotency keys", "Talking to the vendor when things broke"],
+    "red_flags": ["Assumes the API never fails", "Retries forever"]
+  },
+  "skill:payments": {
+    "question": "What can go wrong when money moves between your system and a bank, and how do you catch it?",
+    "listen_for": ["Reconciliation", "Duplicate payments or idempotency", "Settlement timing"],
+    "red_flags": ["Never worked where money mistakes mattered", "Thinks a 200 response means the money moved"]
+  },
+  "skill:observability": {
+    "question": "You get paged at 2am for a service you own. What do you do in the first ten minutes?",
+    "listen_for": ["Check dashboards and recent deploys", "Contain first, fix second", "Writes it up afterwards"],
+    "red_flags": ["Has never been on call", "Restarts things at random"]
+  },
+  "skill:security": {
+    "question": "How do you rotate an API key that live systems depend on without breaking them?",
+    "listen_for": ["Overlap period with both keys valid", "Secret manager, not code", "Revoking the old key"],
+    "red_flags": ["Keys in code or chat", "Has never rotated a credential"]
+  },
+  "skill:code-review": {
+    "question": "What do you look for first when you review someone else's pull request?",
+    "listen_for": ["Correctness and edge cases before style", "Asks questions instead of rewriting", "Tests"],
+    "red_flags": ["Only style comments", "Approves without reading"]
+  },
+  "skill:gcp": {
+    "question": "What have you run on Google Cloud (or AWS), and how did you keep costs and access under control?",
+    "listen_for": ["Named services they used", "IAM or least privilege", "Budgets or alerts"],
+    "red_flags": ["Only console clicking, no repeatable setup", "Everyone is owner"]
+  },
+  "skill:docker": {
+    "question": "How do you make a container image small, fast to build and safe to run?",
+    "listen_for": ["Layer caching", "Slim base images", "Non-root user"],
+    "red_flags": ["Has only run other people's images"]
+  },
+  "skill:react": {
+    "question": "Tell me about a React screen that got slow or messy. How did you fix it?",
+    "listen_for": ["State placement", "Measuring renders", "Splitting components"],
+    "red_flags": ["Only followed tutorials", "Can't explain state"]
+  },
+  "skill:meta-ads": {
+    "question": "A Meta campaign's cost per acquisition doubled this week. What do you check, in what order?",
+    "listen_for": ["Ad fatigue or frequency", "Audience overlap or learning phase", "Tracking or pixel issues", "Creative refresh"],
+    "red_flags": ["Only raises the budget", "Talks about likes and followers, not cost per acquisition"]
+  },
+  "skill:google-ads": {
+    "question": "How do you decide whether a Google Ads campaign is worth keeping?",
+    "listen_for": ["Return on ad spend against a target", "Search terms and negative keywords", "Brand vs non-brand"],
+    "red_flags": ["Measures clicks only", "Never paused a campaign"]
+  },
+  "skill:ga4": {
+    "question": "How would you check that Google Analytics 4 numbers can be trusted before a monthly report?",
+    "listen_for": ["Cross-checks with ad platforms or backend", "Events and conversions setup", "UTM hygiene"],
+    "red_flags": ["Takes dashboard numbers at face value", "Has only viewed reports someone else set up"]
+  },
+  "skill:utm": {
+    "question": "How do you set up and maintain UTM tags so attribution doesn't fall apart?",
+    "listen_for": ["Naming convention", "A single sheet or source of truth", "Regular clean-up"],
+    "red_flags": ["Doesn't know what UTMs are for", "Every campaign tagged differently"]
+  },
+  "skill:looker-studio": {
+    "question": "Show me how you'd build a weekly growth dashboard a CEO can read in one minute.",
+    "listen_for": ["Few metrics tied to goals", "Trends against targets", "Data source reliability"],
+    "red_flags": ["Twenty charts with no story"]
+  },
+  "skill:sheets": {
+    "question": "Describe a spreadsheet you built that other people relied on. How did you keep it from breaking?",
+    "listen_for": ["Lookups and validation", "Separating raw data from calculations", "Documenting it"],
+    "red_flags": ["Only basic formatting"]
+  },
+  "skill:cac-roas": {
+    "question": "Our target customer acquisition cost is ₹450. How would you decide a campaign is failing, and what would you do?",
+    "listen_for": ["Cost per acquisition vs return on ad spend trade-off", "Test budgets and time windows", "Attribution window"],
+    "red_flags": ["Only talks about creatives", "No numbers"]
+  },
+  "skill:ab-testing": {
+    "question": "Tell me about an A/B test you ran. How did you know the result was real?",
+    "listen_for": ["Sample size or duration", "One change at a time", "What they did with a flat result"],
+    "red_flags": ["Calls a winner after a day"]
+  },
+  "skill:creative-briefing": {
+    "question": "How do you brief an agency so the first round of creatives is usable?",
+    "listen_for": ["Clear goal and audience", "Examples of what works", "Feedback loop and deadlines"],
+    "red_flags": ["\"Make it pop\" style briefs", "Never worked with an agency"]
+  },
+  "skill:mixpanel": {
+    "question": "What's a product analytics funnel you built, and what did it change?",
+    "listen_for": ["Event design", "A decision it led to"],
+    "red_flags": ["Only looked at page views"]
+  },
+  "skill:copywriting": {
+    "question": "Show me a piece you wrote and tell me how you measured whether it worked.",
+    "listen_for": ["Audience and goal", "A metric"],
+    "red_flags": ["No way to judge results"]
+  },
+  "skill:seo": {
+    "question": "How would you grow organic traffic for a product with a small blog?",
+    "listen_for": ["Search intent", "Refreshing existing pages", "Technical basics"],
+    "red_flags": ["Keyword stuffing"]
+  },
+  "skill:figma": {
+    "question": "Walk me through a design file you'd hand to an engineer. How do you keep it usable?",
+    "listen_for": ["Components and naming", "States and edge cases"],
+    "red_flags": ["Layer chaos"]
+  },
+  "skill:hubspot": {
+    "question": "How do you keep a CRM clean enough that someone else could pick up your accounts tomorrow?",
+    "listen_for": ["Notes after every call", "Deal stages kept current"],
+    "red_flags": ["Keeps everything in their head or inbox"]
+  }
+}

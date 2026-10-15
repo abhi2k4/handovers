@@ -1,0 +1,669 @@
+{
+  "company": "Northwind",
+  "teams": [
+    {
+      "id": "team:leadership",
+      "name": "Leadership"
+    },
+    {
+      "id": "team:people",
+      "name": "People"
+    },
+    {
+      "id": "team:engineering",
+      "name": "Engineering"
+    },
+    {
+      "id": "team:growth",
+      "name": "Growth"
+    },
+    {
+      "id": "team:sales",
+      "name": "Sales & Success"
+    },
+    {
+      "id": "team:finance",
+      "name": "Finance"
+    }
+  ],
+  "roles": [
+    {
+      "id": "role:ceo",
+      "title": "Chief Executive Officer"
+    },
+    {
+      "id": "role:hr",
+      "title": "HR & Admin Lead"
+    },
+    {
+      "id": "role:em",
+      "title": "Engineering Manager"
+    },
+    {
+      "id": "role:backend",
+      "title": "Backend Engineer"
+    },
+    {
+      "id": "role:frontend",
+      "title": "Frontend Engineer"
+    },
+    {
+      "id": "role:platform",
+      "title": "Platform Engineer"
+    },
+    {
+      "id": "role:growth-lead",
+      "title": "Head of Growth"
+    },
+    {
+      "id": "role:performance",
+      "title": "Performance Marketer"
+    },
+    {
+      "id": "role:content",
+      "title": "Content Marketer"
+    },
+    {
+      "id": "role:designer",
+      "title": "Product Designer"
+    },
+    {
+      "id": "role:sales-lead",
+      "title": "Head of Sales"
+    },
+    {
+      "id": "role:ae",
+      "title": "Account Executive"
+    },
+    {
+      "id": "role:csm",
+      "title": "Customer Success Manager"
+    },
+    {
+      "id": "role:finance",
+      "title": "Finance Manager"
+    }
+  ],
+  "employees": [
+    {
+      "id": "emp:kavya",
+      "name": "Kavya Rao",
+      "email": "kavya@northwind.example",
+      "title": "Founder & CEO",
+      "team": "team:leadership",
+      "role": "role:ceo",
+      "manager": null,
+      "status": "active",
+      "joined_at": "2021-04-01"
+    },
+    {
+      "id": "emp:meera",
+      "name": "Meera Iyer",
+      "email": "meera@northwind.example",
+      "title": "HR & Admin Lead",
+      "team": "team:people",
+      "role": "role:hr",
+      "manager": "emp:kavya",
+      "status": "active",
+      "joined_at": "2022-01-10"
+    },
+    {
+      "id": "emp:priya",
+      "name": "Priya Nair",
+      "email": "priya@northwind.example",
+      "title": "Engineering Manager",
+      "team": "team:engineering",
+      "role": "role:em",
+      "manager": "emp:kavya",
+      "status": "active",
+      "joined_at": "2021-09-01"
+    },
+    {
+      "id": "emp:arjun",
+      "name": "Arjun Mehta",
+      "email": "arjun@northwind.example",
+      "title": "Senior Backend Engineer",
+      "team": "team:engineering",
+      "role": "role:backend",
+      "manager": "emp:priya",
+      "status": "active",
+      "joined_at": "2022-08-01"
+    },
+    {
+      "id": "emp:rohan",
+      "name": "Rohan Das",
+      "email": "rohan@northwind.example",
+      "title": "Backend Engineer",
+      "team": "team:engineering",
+      "role": "role:backend",
+      "manager": "emp:priya",
+      "status": "active",
+      "joined_at": "2023-05-15"
+    },
+    {
+      "id": "emp:sana",
+      "name": "Sana Khan",
+      "email": "sana@northwind.example",
+      "title": "Frontend Engineer",
+      "team": "team:engineering",
+      "role": "role:frontend",
+      "manager": "emp:priya",
+      "status": "active",
+      "joined_at": "2023-01-09"
+    },
+    {
+      "id": "emp:vikram",
+      "name": "Vikram Shah",
+      "email": "vikram@northwind.example",
+      "title": "Platform Engineer",
+      "team": "team:engineering",
+      "role": "role:platform",
+      "manager": "emp:priya",
+      "status": "active",
+      "joined_at": "2022-11-21"
+    },
+    {
+      "id": "emp:farhan",
+      "name": "Farhan Sheikh",
+      "email": "farhan@northwind.example",
+      "title": "Backend Engineer",
+      "team": "team:engineering",
+      "role": "role:backend",
+      "manager": "emp:priya",
+      "status": "incoming",
+      "joined_at": "2026-10-19"
+    },
+    {
+      "id": "emp:aditi",
+      "name": "Aditi Menon",
+      "email": "aditi@northwind.example",
+      "title": "Head of Growth",
+      "team": "team:growth",
+      "role": "role:growth-lead",
+      "manager": "emp:kavya",
+      "status": "active",
+      "joined_at": "2021-11-01"
+    },
+    {
+      "id": "emp:nisha",
+      "name": "Nisha Verma",
+      "email": "nisha@northwind.example",
+      "title": "Performance Marketing Manager",
+      "team": "team:growth",
+      "role": "role:performance",
+      "manager": "emp:aditi",
+      "status": "active",
+      "joined_at": "2023-02-13"
+    },
+    {
+      "id": "emp:kabir",
+      "name": "Kabir Malhotra",
+      "email": "kabir@northwind.example",
+      "title": "Content Marketer",
+      "team": "team:growth",
+      "role": "role:content",
+      "manager": "emp:aditi",
+      "status": "active",
+      "joined_at": "2024-03-04"
+    },
+    {
+      "id": "emp:tara",
+      "name": "Tara Joseph",
+      "email": "tara@northwind.example",
+      "title": "Product Designer",
+      "team": "team:growth",
+      "role": "role:designer",
+      "manager": "emp:aditi",
+      "status": "active",
+      "joined_at": "2023-07-17"
+    },
+    {
+      "id": "emp:ananya",
+      "name": "Ananya Pillai",
+      "email": "ananya@northwind.example",
+      "title": "Performance Marketer",
+      "team": "team:growth",
+      "role": "role:performance",
+      "manager": "emp:aditi",
+      "status": "incoming",
+      "joined_at": "2026-10-26"
+    },
+    {
+      "id": "emp:dev",
+      "name": "Dev Kapoor",
+      "email": "dev@northwind.example",
+      "title": "Head of Sales",
+      "team": "team:sales",
+      "role": "role:sales-lead",
+      "manager": "emp:kavya",
+      "status": "active",
+      "joined_at": "2022-03-14"
+    },
+    {
+      "id": "emp:ishaan",
+      "name": "Ishaan Gupta",
+      "email": "ishaan@northwind.example",
+      "title": "Account Executive",
+      "team": "team:sales",
+      "role": "role:ae",
+      "manager": "emp:dev",
+      "status": "active",
+      "joined_at": "2024-01-22"
+    },
+    {
+      "id": "emp:zoya",
+      "name": "Zoya Ali",
+      "email": "zoya@northwind.example",
+      "title": "Customer Success Manager",
+      "team": "team:sales",
+      "role": "role:csm",
+      "manager": "emp:dev",
+      "status": "active",
+      "joined_at": "2023-09-04"
+    },
+    {
+      "id": "emp:rahul",
+      "name": "Rahul Bose",
+      "email": "rahul@northwind.example",
+      "title": "Finance Manager",
+      "team": "team:finance",
+      "role": "role:finance",
+      "manager": "emp:kavya",
+      "status": "active",
+      "joined_at": "2022-06-06"
+    }
+  ],
+  "areas": [
+    {
+      "id": "area:recon-service",
+      "name": "Reconciliation service",
+      "kind": "service"
+    },
+    {
+      "id": "area:ledger-export",
+      "name": "Ledger export",
+      "kind": "service"
+    },
+    {
+      "id": "area:platform-db",
+      "name": "Production database",
+      "kind": "infrastructure"
+    },
+    {
+      "id": "area:bank-integration",
+      "name": "AcmeBank integration",
+      "kind": "integration"
+    },
+    {
+      "id": "area:backend",
+      "name": "Backend codebase",
+      "kind": "codebase"
+    },
+    {
+      "id": "area:settlement-v2",
+      "name": "Settlement v2",
+      "kind": "project"
+    },
+    {
+      "id": "area:frontend",
+      "name": "Web app",
+      "kind": "codebase"
+    },
+    {
+      "id": "area:infra",
+      "name": "Cloud infrastructure",
+      "kind": "infrastructure"
+    },
+    {
+      "id": "area:paid-social",
+      "name": "Paid social",
+      "kind": "channel"
+    },
+    {
+      "id": "area:paid-search",
+      "name": "Paid search",
+      "kind": "channel"
+    },
+    {
+      "id": "area:attribution",
+      "name": "Attribution",
+      "kind": "process"
+    },
+    {
+      "id": "area:growth-reporting",
+      "name": "Growth reporting",
+      "kind": "process"
+    },
+    {
+      "id": "area:creative",
+      "name": "Ad creatives",
+      "kind": "process"
+    },
+    {
+      "id": "area:landing-pages",
+      "name": "Landing pages",
+      "kind": "channel"
+    },
+    {
+      "id": "area:content",
+      "name": "Content",
+      "kind": "channel"
+    },
+    {
+      "id": "area:sales-pipeline",
+      "name": "Sales pipeline",
+      "kind": "process"
+    },
+    {
+      "id": "area:customer-success",
+      "name": "Customer accounts",
+      "kind": "process"
+    },
+    {
+      "id": "area:finance-ops",
+      "name": "Finance operations",
+      "kind": "process"
+    }
+  ],
+  "skills": [
+    {
+      "id": "skill:python",
+      "name": "Python",
+      "category": "skill",
+      "aliases": [
+        "python",
+        "python3"
+      ]
+    },
+    {
+      "id": "skill:fastapi",
+      "name": "FastAPI",
+      "category": "tool",
+      "aliases": [
+        "fastapi"
+      ]
+    },
+    {
+      "id": "skill:postgresql",
+      "name": "PostgreSQL",
+      "category": "tool",
+      "aliases": [
+        "postgresql",
+        "postgres",
+        "psql"
+      ]
+    },
+    {
+      "id": "skill:alembic",
+      "name": "Database migrations",
+      "category": "skill",
+      "aliases": [
+        "alembic",
+        "database migrations",
+        "schema migrations",
+        "flyway",
+        "liquibase"
+      ]
+    },
+    {
+      "id": "skill:rest-apis",
+      "name": "REST API integrations",
+      "category": "skill",
+      "aliases": [
+        "rest api",
+        "rest apis",
+        "api integration",
+        "api integrations",
+        "webhooks",
+        "third-party apis"
+      ]
+    },
+    {
+      "id": "skill:payments",
+      "name": "Payments & reconciliation",
+      "category": "domain",
+      "aliases": [
+        "payments",
+        "reconciliation",
+        "settlement",
+        "ledger",
+        "fintech"
+      ]
+    },
+    {
+      "id": "skill:observability",
+      "name": "Monitoring & on-call",
+      "category": "skill",
+      "aliases": [
+        "sentry",
+        "grafana",
+        "datadog",
+        "monitoring",
+        "on-call",
+        "incident response"
+      ]
+    },
+    {
+      "id": "skill:security",
+      "name": "Secrets & key management",
+      "category": "skill",
+      "aliases": [
+        "key rotation",
+        "secrets management",
+        "vault",
+        "api keys"
+      ]
+    },
+    {
+      "id": "skill:code-review",
+      "name": "Code review",
+      "category": "skill",
+      "aliases": [
+        "code review",
+        "code reviews",
+        "pull request reviews"
+      ]
+    },
+    {
+      "id": "skill:docker",
+      "name": "Docker",
+      "category": "tool",
+      "aliases": [
+        "docker",
+        "containers",
+        "kubernetes"
+      ]
+    },
+    {
+      "id": "skill:gcp",
+      "name": "Google Cloud",
+      "category": "tool",
+      "aliases": [
+        "gcp",
+        "google cloud",
+        "cloud sql",
+        "cloud run"
+      ]
+    },
+    {
+      "id": "skill:react",
+      "name": "React",
+      "category": "tool",
+      "aliases": [
+        "react",
+        "react.js",
+        "reactjs"
+      ]
+    },
+    {
+      "id": "skill:typescript",
+      "name": "TypeScript",
+      "category": "skill",
+      "aliases": [
+        "typescript"
+      ]
+    },
+    {
+      "id": "skill:meta-ads",
+      "name": "Meta Ads Manager",
+      "category": "tool",
+      "aliases": [
+        "meta ads",
+        "facebook ads",
+        "instagram ads",
+        "ads manager",
+        "meta business manager"
+      ]
+    },
+    {
+      "id": "skill:google-ads",
+      "name": "Google Ads",
+      "category": "tool",
+      "aliases": [
+        "google ads",
+        "adwords",
+        "sem",
+        "search ads"
+      ]
+    },
+    {
+      "id": "skill:ga4",
+      "name": "Google Analytics 4",
+      "category": "tool",
+      "aliases": [
+        "ga4",
+        "google analytics"
+      ]
+    },
+    {
+      "id": "skill:utm",
+      "name": "UTM & attribution",
+      "category": "skill",
+      "aliases": [
+        "utm",
+        "attribution",
+        "multi-touch attribution"
+      ]
+    },
+    {
+      "id": "skill:looker-studio",
+      "name": "Looker Studio",
+      "category": "tool",
+      "aliases": [
+        "looker studio",
+        "data studio"
+      ]
+    },
+    {
+      "id": "skill:sheets",
+      "name": "Spreadsheets",
+      "category": "tool",
+      "aliases": [
+        "google sheets",
+        "excel",
+        "spreadsheets",
+        "spreadsheet"
+      ]
+    },
+    {
+      "id": "skill:cac-roas",
+      "name": "CAC & ROAS optimisation",
+      "category": "domain",
+      "aliases": [
+        "cac",
+        "roas",
+        "cpa",
+        "cost per acquisition",
+        "return on ad spend"
+      ]
+    },
+    {
+      "id": "skill:ab-testing",
+      "name": "A/B testing",
+      "category": "skill",
+      "aliases": [
+        "a/b test",
+        "a/b testing",
+        "ab testing",
+        "experiments"
+      ]
+    },
+    {
+      "id": "skill:creative-briefing",
+      "name": "Creative briefing",
+      "category": "skill",
+      "aliases": [
+        "creative brief",
+        "creative briefs",
+        "agency management",
+        "briefing agencies"
+      ]
+    },
+    {
+      "id": "skill:copywriting",
+      "name": "Copywriting",
+      "category": "skill",
+      "aliases": [
+        "copywriting",
+        "content writing",
+        "blog writing"
+      ]
+    },
+    {
+      "id": "skill:seo",
+      "name": "SEO",
+      "category": "skill",
+      "aliases": [
+        "seo",
+        "search engine optimisation",
+        "search engine optimization"
+      ]
+    },
+    {
+      "id": "skill:figma",
+      "name": "Figma",
+      "category": "tool",
+      "aliases": [
+        "figma"
+      ]
+    },
+    {
+      "id": "skill:mixpanel",
+      "name": "Mixpanel",
+      "category": "tool",
+      "aliases": [
+        "mixpanel",
+        "product analytics"
+      ]
+    },
+    {
+      "id": "skill:hubspot",
+      "name": "HubSpot CRM",
+      "category": "tool",
+      "aliases": [
+        "hubspot",
+        "crm"
+      ]
+    },
+    {
+      "id": "skill:negotiation",
+      "name": "Negotiation",
+      "category": "skill",
+      "aliases": [
+        "negotiation",
+        "closing deals"
+      ]
+    },
+    {
+      "id": "skill:fpna",
+      "name": "FP&A",
+      "category": "domain",
+      "aliases": [
+        "fp&a",
+        "financial planning",
+        "budgeting",
+        "forecasting"
+      ]
+    }
+  ]
+}

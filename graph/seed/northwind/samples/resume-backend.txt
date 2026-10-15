@@ -1,0 +1,5 @@
+Kiran Rao — Backend Engineer
+4 years building payment APIs in Python (Django, FastAPI) on PostgreSQL.
+Owned a settlement reconciliation job processing 2M transactions a day; on-call rotation with Sentry and Grafana.
+Integrated two bank APIs with webhooks and idempotency keys. Wrote Alembic migrations for large tables.
+Also: Docker, AWS, some Go.

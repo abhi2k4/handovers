@@ -1,0 +1,830 @@
+{
+  "run_at": "2026-10-17T09:05:38.903536+00:00",
+  "questions": 18,
+  "llm": "none (retrieval only)",
+  "falkordb_module_version": 60001,
+  "setups": {
+    "before": {
+      "answered_at_4": 0.0,
+      "top1": 0.0,
+      "leaks": 0,
+      "answerable": 16,
+      "private": 2
+    },
+    "handovers": {
+      "answered_at_4": 1.0,
+      "top1": 1.0,
+      "leaks": 0,
+      "answerable": 16,
+      "private": 2
+    },
+    "flat": {
+      "answered_at_4": 0.562,
+      "top1": 0.188,
+      "leaks": 1,
+      "answerable": 16,
+      "private": 2
+    },
+    "naive": {
+      "answered_at_4": 0.688,
+      "top1": 0.5,
+      "leaks": 1,
+      "answerable": 16,
+      "private": 2
+    }
+  },
+  "detail": {
+    "handovers": [
+      {
+        "question": "Why does the reconciliation service retry only 3 times?",
+        "gold": [
+          "clm:recon-retry-limit@2025"
+        ],
+        "owner": "emp:arjun",
+        "answerable": true,
+        "retrieved": [
+          "clm:recon-retry-limit@2025",
+          "clm:recon-retry-limit@2024",
+          "proc:deploy-recon"
+        ],
+        "hit": true,
+        "top1": true
+      },
+      {
+        "question": "What was the recon retry limit before it was lowered?",
+        "gold": [
+          "clm:recon-retry-limit@2024",
+          "clm:recon-retry-limit@runbook"
+        ],
+        "owner": "emp:arjun",
+        "answerable": true,
+        "retrieved": [
+          "clm:recon-retry-limit@runbook",
+          "clm:recon-retry-limit@2025",
+          "clm:recon-retry-limit@2024"
+        ],
+        "hit": true,
+        "top1": true
+      },
+      {
+        "question": "Who decided to retry bank settlement calls 5 times and why?",
+        "gold": [
+          "dec:recon-retry-5",
+          "clm:recon-retry-limit@2024"
+        ],
+        "owner": "emp:arjun",
+        "answerable": true,
+        "retrieved": [
+          "clm:recon-retry-limit@2024",
+          "clm:recon-retry-limit@runbook",
+          "clm:recon-retry-limit@2025"
+        ],
+        "hit": true,
+        "top1": true
+      },
+      {
+        "question": "How do I deploy the reconciliation service?",
+        "gold": [
+          "proc:deploy-recon"
+        ],
+        "owner": "emp:arjun",
+        "answerable": true,
+        "retrieved": [
+          "proc:deploy-recon",
+          "resp:recon-service",
+          "clm:recon-retry-limit@2025",
+          "clm:recon-retry-limit@2024"
+        ],
+        "hit": true,
+        "top1": true
+      },
+      {
+        "question": "Why do settlements run in 30 minute batches?",
+        "gold": [
+          "dec:settle-v2-batching"
+        ],
+        "owner": "emp:arjun",
+        "answerable": true,
+        "retrieved": [
+          "dec:settle-v2-batching",
+          "dec:recon-retry-5",
+          "clm:recon-retry-limit@2025",
+          "proc:how:resp-ledger-unstick"
+        ],
+        "hit": true,
+        "top1": true
+      },
+      {
+        "question": "What does the recon runbook say about retries?",
+        "gold": [
+          "clm:recon-retry-limit@runbook"
+        ],
+        "owner": "emp:arjun",
+        "answerable": true,
+        "retrieved": [
+          "clm:recon-retry-limit@runbook",
+          "clm:recon-retry-limit@2025"
+        ],
+        "hit": true,
+        "top1": true
+      },
+      {
+        "question": "Why did we pause Google Ads?",
+        "gold": [
+          "dec:pause-google-ads"
+        ],
+        "owner": "emp:nisha",
+        "answerable": true,
+        "retrieved": [
+          "dec:pause-google-ads"
+        ],
+        "hit": true,
+        "top1": true
+      },
+      {
+        "question": "What is the blended CAC target?",
+        "gold": [
+          "clm:cac-target@jul"
+        ],
+        "owner": "emp:nisha",
+        "answerable": true,
+        "retrieved": [
+          "clm:cac-target@jul",
+          "clm:cac-target@q2"
+        ],
+        "hit": true,
+        "top1": true
+      },
+      {
+        "question": "Why did we shift budget to Reels?",
+        "gold": [
+          "dec:reels-30"
+        ],
+        "owner": "emp:nisha",
+        "answerable": true,
+        "retrieved": [
+          "dec:reels-30",
+          "dec:pause-google-ads"
+        ],
+        "hit": true,
+        "top1": true
+      },
+      {
+        "question": "When does the Mixpanel contract renew?",
+        "gold": [
+          "clm:mixpanel-renewal"
+        ],
+        "owner": "emp:nisha",
+        "answerable": true,
+        "retrieved": [
+          "clm:mixpanel-renewal",
+          "sth:mixpanel-tom"
+        ],
+        "hit": true,
+        "top1": true
+      },
+      {
+        "question": "What was the CAC target in the Q2 deck?",
+        "gold": [
+          "clm:cac-target@q2"
+        ],
+        "owner": "emp:nisha",
+        "answerable": true,
+        "retrieved": [
+          "clm:cac-target@q2",
+          "clm:cac-target@jul"
+        ],
+        "hit": true,
+        "top1": true
+      },
+      {
+        "question": "What did Arjun say about career plans in his 1:1?",
+        "gold": [
+          "clm:arjun-career"
+        ],
+        "owner": "emp:arjun",
+        "answerable": false,
+        "retrieved": [],
+        "hit": false,
+        "top1": false
+      },
+      {
+        "question": "What salary is Nisha asking for?",
+        "gold": [
+          "clm:nisha-salary"
+        ],
+        "owner": "emp:nisha",
+        "answerable": false,
+        "retrieved": [],
+        "hit": false,
+        "top1": false
+      },
+      {
+        "question": "Who is our contact at AcmeBank?",
+        "gold": [
+          "sth:acmebank-leena"
+        ],
+        "owner": "emp:arjun",
+        "answerable": true,
+        "retrieved": [
+          "sth:acmebank-leena",
+          "dec:recon-retry-5",
+          "resp:acmebank-integration",
+          "resp:acmebank-key-rotation"
+        ],
+        "hit": true,
+        "top1": true
+      },
+      {
+        "question": "How do I unstick a hung ledger export batch?",
+        "gold": [
+          "proc:how:resp-ledger-unstick"
+        ],
+        "owner": "emp:arjun",
+        "answerable": true,
+        "retrieved": [
+          "proc:how:resp-ledger-unstick",
+          "resp:ledger-unstick"
+        ],
+        "hit": true,
+        "top1": true
+      },
+      {
+        "question": "Who is the agency lead for our ad creatives?",
+        "gold": [
+          "sth:pixelpine-rhea"
+        ],
+        "owner": "emp:nisha",
+        "answerable": true,
+        "retrieved": [
+          "sth:pixelpine-rhea"
+        ],
+        "hit": true,
+        "top1": true
+      },
+      {
+        "question": "How do I rebuild the UTM attribution sheet at month end?",
+        "gold": [
+          "proc:how:resp-utm-rebuild"
+        ],
+        "owner": "emp:nisha",
+        "answerable": true,
+        "retrieved": [
+          "proc:how:resp-utm-rebuild",
+          "resp:utm-rebuild"
+        ],
+        "hit": true,
+        "top1": true
+      },
+      {
+        "question": "Who is our Mixpanel customer success contact?",
+        "gold": [
+          "sth:mixpanel-tom"
+        ],
+        "owner": "emp:nisha",
+        "answerable": true,
+        "retrieved": [
+          "sth:mixpanel-tom"
+        ],
+        "hit": true,
+        "top1": true
+      }
+    ],
+    "flat": [
+      {
+        "question": "Why does the reconciliation service retry only 3 times?",
+        "gold": [
+          "clm:recon-retry-limit@2025"
+        ],
+        "owner": "emp:arjun",
+        "answerable": true,
+        "retrieved": [
+          "src:pr:418",
+          "src:eod:arjun:2026-04-08",
+          "src:eod:arjun:2026-04-24",
+          "src:eod:arjun:2026-05-22"
+        ],
+        "hit": true,
+        "top1": true
+      },
+      {
+        "question": "What was the recon retry limit before it was lowered?",
+        "gold": [
+          "clm:recon-retry-limit@2024",
+          "clm:recon-retry-limit@runbook"
+        ],
+        "owner": "emp:arjun",
+        "answerable": true,
+        "retrieved": [
+          "src:pr:418",
+          "src:doc:adr-007",
+          "src:eod:arjun:2026-08-10",
+          "src:eod:arjun:2026-09-15"
+        ],
+        "hit": true,
+        "top1": false
+      },
+      {
+        "question": "Who decided to retry bank settlement calls 5 times and why?",
+        "gold": [
+          "dec:recon-retry-5",
+          "clm:recon-retry-limit@2024"
+        ],
+        "owner": "emp:arjun",
+        "answerable": true,
+        "retrieved": [
+          "src:pr:418",
+          "src:crm:mixpanel-renewal",
+          "src:eod:arjun:2026-08-19",
+          "src:eod:arjun:2026-09-02"
+        ],
+        "hit": false,
+        "top1": false
+      },
+      {
+        "question": "How do I deploy the reconciliation service?",
+        "gold": [
+          "proc:deploy-recon"
+        ],
+        "owner": "emp:arjun",
+        "answerable": true,
+        "retrieved": [
+          "src:msg:vercel-admins",
+          "src:eod:arjun:2026-04-08",
+          "src:eod:arjun:2026-04-24",
+          "src:eod:arjun:2026-05-22"
+        ],
+        "hit": false,
+        "top1": false
+      },
+      {
+        "question": "Why do settlements run in 30 minute batches?",
+        "gold": [
+          "dec:settle-v2-batching"
+        ],
+        "owner": "emp:arjun",
+        "answerable": true,
+        "retrieved": [
+          "src:eod:arjun:2026-08-10",
+          "src:eod:rahul:2026-04-08",
+          "src:eod:rahul:2026-04-23",
+          "src:eod:rahul:2026-05-13"
+        ],
+        "hit": false,
+        "top1": false
+      },
+      {
+        "question": "What does the recon runbook say about retries?",
+        "gold": [
+          "clm:recon-retry-limit@runbook"
+        ],
+        "owner": "emp:arjun",
+        "answerable": true,
+        "retrieved": [
+          "src:eod:arjun:2026-08-10",
+          "src:eod:arjun:2026-09-15",
+          "src:meeting:retro-2291",
+          "src:ticket:inc-2291"
+        ],
+        "hit": false,
+        "top1": false
+      },
+      {
+        "question": "Why did we pause Google Ads?",
+        "gold": [
+          "dec:pause-google-ads"
+        ],
+        "owner": "emp:nisha",
+        "answerable": true,
+        "retrieved": [
+          "src:msg:gads-admins",
+          "src:answer:dc5be28a99",
+          "src:msg:google-ads-paused",
+          "src:doc:jd-performance-2022"
+        ],
+        "hit": true,
+        "top1": false
+      },
+      {
+        "question": "What is the blended CAC target?",
+        "gold": [
+          "clm:cac-target@jul"
+        ],
+        "owner": "emp:nisha",
+        "answerable": true,
+        "retrieved": [
+          "src:answer:48f8833929",
+          "src:answer:4937766d94",
+          "src:doc:q2-growth-deck",
+          "src:eod:nisha:2026-07-15"
+        ],
+        "hit": true,
+        "top1": false
+      },
+      {
+        "question": "Why did we shift budget to Reels?",
+        "gold": [
+          "dec:reels-30"
+        ],
+        "owner": "emp:nisha",
+        "answerable": true,
+        "retrieved": [
+          "src:eod:nisha:2026-06-15",
+          "src:eod:nisha:2026-06-19",
+          "src:eod:nisha:2026-09-22",
+          "src:eod:nisha:2026-06-17"
+        ],
+        "hit": false,
+        "top1": false
+      },
+      {
+        "question": "When does the Mixpanel contract renew?",
+        "gold": [
+          "clm:mixpanel-renewal"
+        ],
+        "owner": "emp:nisha",
+        "answerable": true,
+        "retrieved": [
+          "src:answer:44433ba0a7",
+          "src:crm:mixpanel-renewal",
+          "src:eod:kabir:2026-04-20",
+          "src:eod:kabir:2026-05-11"
+        ],
+        "hit": true,
+        "top1": false
+      },
+      {
+        "question": "What was the CAC target in the Q2 deck?",
+        "gold": [
+          "clm:cac-target@q2"
+        ],
+        "owner": "emp:nisha",
+        "answerable": true,
+        "retrieved": [
+          "src:doc:q2-growth-deck",
+          "src:eod:nisha:2026-07-15",
+          "src:eod:nisha:2026-07-22",
+          "src:eod:nisha:2026-08-11"
+        ],
+        "hit": true,
+        "top1": true
+      },
+      {
+        "question": "What did Arjun say about career plans in his 1:1?",
+        "gold": [
+          "clm:arjun-career"
+        ],
+        "owner": "emp:arjun",
+        "answerable": false,
+        "retrieved": [
+          "src:doc:arjun-1on1",
+          "src:eod:arjun:2026-07-24",
+          "src:eod:zoya:2026-04-08",
+          "src:eod:zoya:2026-04-09"
+        ],
+        "hit": true,
+        "top1": true
+      },
+      {
+        "question": "What salary is Nisha asking for?",
+        "gold": [
+          "clm:nisha-salary"
+        ],
+        "owner": "emp:nisha",
+        "answerable": false,
+        "retrieved": [
+          "src:eod:aditi:2026-04-08",
+          "src:eod:aditi:2026-05-12",
+          "src:eod:aditi:2026-05-21",
+          "src:eod:aditi:2026-06-01"
+        ],
+        "hit": false,
+        "top1": false
+      },
+      {
+        "question": "Who is our contact at AcmeBank?",
+        "gold": [
+          "sth:acmebank-leena"
+        ],
+        "owner": "emp:arjun",
+        "answerable": true,
+        "retrieved": [
+          "src:eod:arjun:2026-06-16",
+          "src:eod:arjun:2026-08-10",
+          "src:eod:arjun:2026-08-18",
+          "src:eod:arjun:2026-08-19"
+        ],
+        "hit": true,
+        "top1": false
+      },
+      {
+        "question": "How do I unstick a hung ledger export batch?",
+        "gold": [
+          "proc:how:resp-ledger-unstick"
+        ],
+        "owner": "emp:arjun",
+        "answerable": true,
+        "retrieved": [
+          "src:ticket:ledger-301",
+          "src:ticket:ledger-302",
+          "src:ticket:ledger-303",
+          "src:ticket:ledger-304"
+        ],
+        "hit": false,
+        "top1": false
+      },
+      {
+        "question": "Who is the agency lead for our ad creatives?",
+        "gold": [
+          "sth:pixelpine-rhea"
+        ],
+        "owner": "emp:nisha",
+        "answerable": true,
+        "retrieved": [
+          "src:eod:nisha:2026-04-10",
+          "src:eod:nisha:2026-04-20",
+          "src:eod:nisha:2026-05-14",
+          "src:eod:nisha:2026-05-21"
+        ],
+        "hit": true,
+        "top1": true
+      },
+      {
+        "question": "How do I rebuild the UTM attribution sheet at month end?",
+        "gold": [
+          "proc:how:resp-utm-rebuild"
+        ],
+        "owner": "emp:nisha",
+        "answerable": true,
+        "retrieved": [
+          "src:eod:rahul:2026-04-16",
+          "src:eod:rahul:2026-04-28",
+          "src:eod:rahul:2026-06-30",
+          "src:eod:rahul:2026-07-14"
+        ],
+        "hit": false,
+        "top1": false
+      },
+      {
+        "question": "Who is our Mixpanel customer success contact?",
+        "gold": [
+          "sth:mixpanel-tom"
+        ],
+        "owner": "emp:nisha",
+        "answerable": true,
+        "retrieved": [
+          "src:answer:44433ba0a7",
+          "src:crm:mixpanel-renewal",
+          "src:eod:kabir:2026-04-20",
+          "src:eod:kabir:2026-05-11"
+        ],
+        "hit": true,
+        "top1": false
+      }
+    ],
+    "naive": [
+      {
+        "question": "Why does the reconciliation service retry only 3 times?",
+        "gold": [
+          "clm:recon-retry-limit@2025"
+        ],
+        "owner": "emp:arjun",
+        "answerable": true,
+        "retrieved": [
+          "clm:recon-retry-limit@2025",
+          "clm:recon-retry-limit@2024",
+          "clm:recon-retry-limit@runbook",
+          "proc:deploy-recon"
+        ],
+        "hit": true,
+        "top1": true
+      },
+      {
+        "question": "What was the recon retry limit before it was lowered?",
+        "gold": [
+          "clm:recon-retry-limit@2024",
+          "clm:recon-retry-limit@runbook"
+        ],
+        "owner": "emp:arjun",
+        "answerable": true,
+        "retrieved": [
+          "clm:recon-retry-limit@runbook",
+          "clm:recon-retry-limit@2025",
+          "clm:recon-retry-limit@2024"
+        ],
+        "hit": true,
+        "top1": true
+      },
+      {
+        "question": "Who decided to retry bank settlement calls 5 times and why?",
+        "gold": [
+          "dec:recon-retry-5",
+          "clm:recon-retry-limit@2024"
+        ],
+        "owner": "emp:arjun",
+        "answerable": true,
+        "retrieved": [
+          "clm:recon-retry-limit@runbook",
+          "clm:recon-retry-limit@2024",
+          "clm:recon-retry-limit@2025"
+        ],
+        "hit": true,
+        "top1": false
+      },
+      {
+        "question": "How do I deploy the reconciliation service?",
+        "gold": [
+          "proc:deploy-recon"
+        ],
+        "owner": "emp:arjun",
+        "answerable": true,
+        "retrieved": [
+          "proc:deploy-recon",
+          "clm:recon-retry-limit@2025",
+          "clm:recon-retry-limit@2024"
+        ],
+        "hit": true,
+        "top1": true
+      },
+      {
+        "question": "Why do settlements run in 30 minute batches?",
+        "gold": [
+          "dec:settle-v2-batching"
+        ],
+        "owner": "emp:arjun",
+        "answerable": true,
+        "retrieved": [
+          "dec:settle-v2-batching",
+          "dec:recon-retry-5",
+          "clm:recon-retry-limit@2025",
+          "clm:recon-retry-limit@runbook"
+        ],
+        "hit": true,
+        "top1": true
+      },
+      {
+        "question": "What does the recon runbook say about retries?",
+        "gold": [
+          "clm:recon-retry-limit@runbook"
+        ],
+        "owner": "emp:arjun",
+        "answerable": true,
+        "retrieved": [
+          "clm:recon-retry-limit@runbook",
+          "clm:recon-retry-limit@2025"
+        ],
+        "hit": true,
+        "top1": true
+      },
+      {
+        "question": "Why did we pause Google Ads?",
+        "gold": [
+          "dec:pause-google-ads"
+        ],
+        "owner": "emp:nisha",
+        "answerable": true,
+        "retrieved": [
+          "dec:pause-google-ads"
+        ],
+        "hit": true,
+        "top1": true
+      },
+      {
+        "question": "What is the blended CAC target?",
+        "gold": [
+          "clm:cac-target@jul"
+        ],
+        "owner": "emp:nisha",
+        "answerable": true,
+        "retrieved": [
+          "clm:cac-target@q2",
+          "clm:cac-target@jul"
+        ],
+        "hit": true,
+        "top1": false
+      },
+      {
+        "question": "Why did we shift budget to Reels?",
+        "gold": [
+          "dec:reels-30"
+        ],
+        "owner": "emp:nisha",
+        "answerable": true,
+        "retrieved": [
+          "dec:reels-30"
+        ],
+        "hit": true,
+        "top1": true
+      },
+      {
+        "question": "When does the Mixpanel contract renew?",
+        "gold": [
+          "clm:mixpanel-renewal"
+        ],
+        "owner": "emp:nisha",
+        "answerable": true,
+        "retrieved": [
+          "clm:mixpanel-renewal"
+        ],
+        "hit": true,
+        "top1": true
+      },
+      {
+        "question": "What was the CAC target in the Q2 deck?",
+        "gold": [
+          "clm:cac-target@q2"
+        ],
+        "owner": "emp:nisha",
+        "answerable": true,
+        "retrieved": [
+          "clm:cac-target@jul",
+          "clm:cac-target@q2"
+        ],
+        "hit": true,
+        "top1": false
+      },
+      {
+        "question": "What did Arjun say about career plans in his 1:1?",
+        "gold": [
+          "clm:arjun-career"
+        ],
+        "owner": "emp:arjun",
+        "answerable": false,
+        "retrieved": [],
+        "hit": false,
+        "top1": false
+      },
+      {
+        "question": "What salary is Nisha asking for?",
+        "gold": [
+          "clm:nisha-salary"
+        ],
+        "owner": "emp:nisha",
+        "answerable": false,
+        "retrieved": [
+          "clm:nisha-salary"
+        ],
+        "hit": true,
+        "top1": true
+      },
+      {
+        "question": "Who is our contact at AcmeBank?",
+        "gold": [
+          "sth:acmebank-leena"
+        ],
+        "owner": "emp:arjun",
+        "answerable": true,
+        "retrieved": [
+          "dec:recon-retry-5"
+        ],
+        "hit": false,
+        "top1": false
+      },
+      {
+        "question": "How do I unstick a hung ledger export batch?",
+        "gold": [
+          "proc:how:resp-ledger-unstick"
+        ],
+        "owner": "emp:arjun",
+        "answerable": true,
+        "retrieved": [],
+        "hit": false,
+        "top1": false
+      },
+      {
+        "question": "Who is the agency lead for our ad creatives?",
+        "gold": [
+          "sth:pixelpine-rhea"
+        ],
+        "owner": "emp:nisha",
+        "answerable": true,
+        "retrieved": [],
+        "hit": false,
+        "top1": false
+      },
+      {
+        "question": "How do I rebuild the UTM attribution sheet at month end?",
+        "gold": [
+          "proc:how:resp-utm-rebuild"
+        ],
+        "owner": "emp:nisha",
+        "answerable": true,
+        "retrieved": [],
+        "hit": false,
+        "top1": false
+      },
+      {
+        "question": "Who is our Mixpanel customer success contact?",
+        "gold": [
+          "sth:mixpanel-tom"
+        ],
+        "owner": "emp:nisha",
+        "answerable": true,
+        "retrieved": [],
+        "hit": false,
+        "top1": false
+      }
+    ]
+  },
+  "seconds": 1.55
+}
