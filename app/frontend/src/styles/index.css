@@ -1,0 +1,245 @@
+@import 'tailwindcss';
+
+/* `dark:` follows the app's theme switch (the `dark` class on <html>), not only the OS setting. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Handovers design tokens, taken from the logo: navy for text, logo blue for actions, logo teal
+ * for "done / handed over". Cool slate neutrals, hairlines instead of heavy shadows, red only for
+ * risk (always with words). Geist, self-hosted. Every text colour passes WCAG AA on its background.
+ */
+@theme {
+  /* Landing page (/) only; the colliding names (ink, line, shadow-card, font) are re-declared
+     inside .landing in landing/landing.css, so the app keeps its own palette. */
+  --color-paper: #faf8f4;
+  --color-card: #ffffff;
+  --color-green: #0c7a4d;
+  --color-green-deep: #0a5f3d;
+  --color-green-soft: #e9f3ee;
+  --color-dark: #111113;
+  --color-dark-2: #1b1b1f;
+  --shadow-frame: 0 24px 80px rgba(22, 24, 29, 0.18);
+
+  --font-sans: 'Geist Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* Metadata, labels, ids and figures: the record-keeping voice of the app. */
+  --font-mono: 'Geist Mono Variable', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --color-page: #ffffff;
+  --color-app: #f5f6f8;
+  --color-hover: #eef0f4;
+  --color-selected: #e7eaf0;
+  --color-line: #e2e5eb;
+  --color-control: #cfd4dd;
+  --color-strong: #bcc5d2;
+  --color-mark: #a3aebd;
+
+  --color-ink: #0f1b2d;
+  /* Text on an ink-filled surface (the primary button, your question in Ask). */
+  --color-on-ink: #ffffff;
+  --color-ink-2: #4a5568;
+  --color-ink-3: #637082;
+
+  --color-accent: #1c64d8;
+  --color-accent-fill: #1f6feb;
+  --color-accent-hover: #1a5fd0;
+  --color-accent-soft: #eaf2fe;
+
+  --color-brand-teal: #38b098;
+
+  --color-risk: #e5484d;
+  --color-risk-text: #c42b31;
+  --color-risk-soft: #fdecec;
+  --color-soon: #9a5b00;
+  --color-soon-fill: #e2a336;
+  --color-soon-soft: #fff4d6;
+
+  --color-ok: #2a9d82;
+  --color-ok-text: #0f7a5f;
+  --color-ok-soft: #e7f6f0;
+
+  /* Categorical chart colours (one per kind of thing held: work, accounts, contacts, knowledge).
+   * Order checked with the colour-vision validator (adjacent CVD dE >= 9); always shown with a legend. */
+  --color-c1: #2a78d6;
+  --color-c2: #eb6834;
+  --color-c3: #1baf7a;
+  --color-c4: #6250d6;
+
+  /* Single-series chart steps: logo blue, darkest first. */
+  --color-s1: #1a56c4;
+  --color-s2: #3b82f6;
+  --color-s3: #85b4fa;
+  --color-s4: #c4dbfd;
+
+  /* Flat by default: a hairline, no drop shadow. Raised is for things that float (menus, hover). */
+  --shadow-card: 0 0 0 1px var(--color-line);
+  --shadow-raised: 0 0 0 1px var(--color-control), 0 6px 16px -8px rgba(15, 27, 45, 0.18);
+}
+
+/*
+ * Dark theme: the same tokens, re-pointed. Cool near-black slates with the logo blue and teal
+ * brightened so every text colour still passes WCAG AA on its surface. App only: the landing page
+ * never gets the `dark` class.
+ */
+:root.dark {
+  --color-page: #10151c;
+  --color-app: #0b0f14;
+  --color-hover: #19202a;
+  --color-selected: #1f2733;
+  --color-line: #232b37;
+  --color-control: #333e4d;
+  --color-strong: #485569;
+  --color-mark: #5f6c80;
+
+  --color-ink: #e8edf4;
+  --color-on-ink: #0b0f14;
+  --color-ink-2: #aab5c4;
+  --color-ink-3: #8592a4;
+
+  --color-accent: #77abff;
+  --color-accent-fill: #3b82f6;
+  --color-accent-hover: #2f6fdc;
+  --color-accent-soft: #15253d;
+
+  --color-risk: #f2555a;
+  --color-risk-text: #ff8a8d;
+  --color-risk-soft: #2d1518;
+  --color-soon: #f0b65a;
+  --color-soon-fill: #e2a336;
+  --color-soon-soft: #2b2110;
+
+  --color-ok: #2fb58f;
+  --color-ok-text: #5ad6ae;
+  --color-ok-soft: #0f2720;
+
+  --color-c1: #4b92f0;
+  --color-c2: #f07d4c;
+  --color-c3: #2cc28c;
+  --color-c4: #8576f2;
+
+  /* Single series: the brightest step carries the most emphasis on a dark surface. */
+  --color-s1: #77abff;
+  --color-s2: #3b82f6;
+  --color-s3: #2a5db0;
+  --color-s4: #1b3561;
+
+  --shadow-raised: 0 0 0 1px var(--color-control), 0 8px 20px -8px rgba(0, 0, 0, 0.6);
+}
+
+@layer base {
+  html {
+    @apply bg-page text-ink antialiased;
+  }
+  body {
+    @apply min-h-dvh font-sans text-[14px] leading-[20px];
+  }
+  ::selection {
+    background: var(--color-accent-soft);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-accent-fill);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+  button {
+    cursor: pointer;
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+}
+
+/* Small-caps mono label: section names, stat labels, column heads. */
+@utility eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  line-height: 14px;
+  font-weight: 500;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+  color: var(--color-ink-3);
+}
+
+/* Tabular figures for every number that is compared or counted. */
+@utility num {
+  font-variant-numeric: tabular-nums;
+}
+
+@utility hairline {
+  box-shadow: inset 0 0 0 1px var(--color-line);
+}
+
+/* Print only the document on screen (handover document, relieving letter). */
+@media print {
+  /* Paper is white: print in the light theme even when the app is dark. */
+  :root.dark {
+    --color-page: #ffffff;
+    --color-ink: #0f1b2d;
+    --color-ink-2: #4a5568;
+    --color-ink-3: #637082;
+    --color-line: #e2e5eb;
+    --color-strong: #bcc5d2;
+  }
+  body * {
+    visibility: hidden;
+  }
+  .document,
+  .document * {
+    visibility: visible;
+  }
+  .document {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    max-width: none;
+    box-shadow: none;
+  }
+}
+
+/* Motion: pages fade up a touch on navigation; popovers scale in. Off under reduced motion (base layer). */
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+  }
+}
+@keyframes slide-in-tray {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@utility tray-slide-in {
+  animation: slide-in-tray 280ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@utility backdrop-fade-in {
+  animation: fade-in 200ms ease-out forwards;
+}
+
