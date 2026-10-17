@@ -1,0 +1,194 @@
+/* The landing page's look, scoped to .landing so the app (under /dashboard) keeps its own.
+   General Sans: Fontshare, ITF Free Font License. Newsreader: Google Fonts, SIL OFL.
+   Photos in art/: Unsplash licence. App captures in art/: our own product. */
+@font-face {
+  font-family: 'General Sans';
+  src: url('./fonts/general-sans-400.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'General Sans';
+  src: url('./fonts/general-sans-500.woff2') format('woff2');
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'General Sans';
+  src: url('./fonts/general-sans-600.woff2') format('woff2');
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'General Sans';
+  src: url('./fonts/general-sans-700.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Newsreader';
+  src: url('./fonts/newsreader-400.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Newsreader';
+  src: url('./fonts/newsreader-500.woff2') format('woff2');
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Newsreader';
+  src: url('./fonts/newsreader-400-italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+.landing {
+  /* Warm paper, near-black ink, deep green: overrides the app's tokens inside this tree only. */
+  --color-ink: #16181d;
+  --color-ink-2: #51555e;
+  --color-ink-3: #8a8e98;
+  --color-line: rgba(22, 24, 29, 0.1);
+  --shadow-card: 0 1px 2px rgba(22, 24, 29, 0.05), 0 8px 28px rgba(22, 24, 29, 0.06);
+  --landing-serif: 'Newsreader', Georgia, serif;
+
+  min-height: 100dvh;
+  overflow-x: clip;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: 'General Sans', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* A breath of paper grain. */
+.landing::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.025;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* In the components layer, so utilities on the same element still win. */
+@layer components {
+  /* One grid for the whole page: every section shares this left edge. */
+  .landing .wrap {
+    width: 100%;
+    max-width: 1280px;
+    margin-inline: auto;
+    padding-inline: 20px;
+  }
+  @media (min-width: 640px) {
+    .landing .wrap {
+      padding-inline: 40px;
+    }
+  }
+  .landing .section {
+    padding-top: 128px;
+  }
+  @media (min-width: 640px) {
+    .landing .section {
+      padding-top: 176px;
+    }
+  }
+
+  /* Every headline is a serif at regular weight; size does the work. */
+  .landing .font-display,
+  .landing .serif {
+    font-family: var(--landing-serif);
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    font-optical-sizing: auto;
+  }
+  .landing .h-hero {
+    font-size: clamp(3.1rem, 7.6vw, 7rem);
+    line-height: 0.98;
+    letter-spacing: -0.035em;
+  }
+  .landing .h-hook {
+    font-size: clamp(3rem, 8.4vw, 8rem);
+    line-height: 0.98;
+    letter-spacing: -0.035em;
+  }
+  .landing .h-section {
+    font-size: clamp(2.5rem, 4.6vw, 4.25rem);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+  .landing .font-system {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
+    letter-spacing: -0.005em;
+  }
+
+  /* Product captures float on photographs, like prints on a table. */
+  .landing .plate {
+    background: #e9e5dc;
+    isolation: isolate;
+  }
+  .landing .shot {
+    border-radius: 14px;
+    box-shadow:
+      0 0 0 1px rgba(22, 24, 29, 0.05),
+      0 2px 4px rgba(22, 24, 29, 0.06),
+      0 28px 60px -18px rgba(22, 24, 29, 0.38);
+  }
+  .landing .shadow-shot {
+    box-shadow:
+      0 0 0 1px rgba(22, 24, 29, 0.04),
+      0 24px 50px -16px rgba(22, 24, 29, 0.35);
+  }
+
+  .landing .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 46px;
+    padding: 0 22px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 600;
+    transition:
+      transform 0.15s ease,
+      background-color 0.15s ease,
+      border-color 0.15s ease;
+  }
+  .landing .btn:hover {
+    transform: translateY(-1px);
+  }
+  .landing .btn-green {
+    background: var(--color-green);
+    color: #fff;
+  }
+  .landing .btn-lg {
+    height: 54px;
+    padding: 0 28px;
+    font-size: 16px;
+  }
+  .landing .btn-ghost {
+    border: 1px solid var(--color-line);
+    background: var(--color-card);
+    color: var(--color-ink);
+  }
+  .landing .btn-ghost:hover {
+    border-color: rgba(22, 24, 29, 0.28);
+  }
+  /* Liquid glass: frosted, saturated, with a lit top edge and a soft shadow. */
+  .landing .glass {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.42));
+    -webkit-backdrop-filter: blur(18px) saturate(1.8);
+    backdrop-filter: blur(18px) saturate(1.8);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.95),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.25),
+      0 0 0 1px rgba(22, 24, 29, 0.06),
+      0 12px 32px -12px rgba(22, 24, 29, 0.28);
+  }
+}
