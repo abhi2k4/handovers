@@ -1,0 +1,51 @@
+# Live deployment overlay: Caddy terminates TLS and proxies to the frontend (and Keycloak under /auth); nothing else is public.
+#   docker compose -f docker-compose.yml -f deployment/compose.deploy.yml up -d --build
+# Requires SITE_ADDRESS in .env (a hostname resolving to this machine, e.g. 34-1-2-3.sslip.io).
+# Sign-in: with COMPOSE_PROFILES=auth, Keycloak is served under /auth on the same host (Caddyfile),
+# so KEYCLOAK_PUBLIC_URL is https://<host>/auth and the backend reaches it at http://keycloak:8180/auth.
+services:
+  falkordb:
+    ports: !override
+      - "127.0.0.1:6379:6379"
+      - "127.0.0.1:3000:3000"
+  backend:
+    ports: !override
+      - "127.0.0.1:8000:8000"
+    environment:
+      KEYCLOAK_URL: "${KEYCLOAK_URL:+http://keycloak:8180/auth}"
+  keycloak:
+    environment:
+      KC_HTTP_RELATIVE_PATH: /auth
+      # The admin console is not public (Caddy returns 404); it answers on the SSH tunnel address.
+      KC_HOSTNAME_ADMIN: "http://localhost:${KEYCLOAK_PORT:-8180}/auth"
+      # Caddy terminates TLS and sends X-Forwarded-*.
+      KC_PROXY_HEADERS: xforwarded
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - >-
+          exec 3<>/dev/tcp/127.0.0.1/9000
+          && printf 'GET /auth/health/ready HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3
+          && grep -q UP <&3
+  frontend:
+    ports: !override []
+  caddy:
+    image: caddy:2.10-alpine
+    container_name: handovers-caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      SITE_ADDRESS: "${SITE_ADDRESS:?set SITE_ADDRESS in .env}"
+    volumes:
+      - ./deployment/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      frontend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  caddy_data:
+  caddy_config:

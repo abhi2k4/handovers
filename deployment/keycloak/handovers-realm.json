@@ -1,0 +1,58 @@
+{
+  "realm": "handovers",
+  "displayName": "Handovers",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": false,
+  "rememberMe": false,
+  "bruteForceProtected": true,
+  "failureFactor": 10,
+  "loginTheme": "keycloak.v2",
+  "accountTheme": "keycloak.v3",
+  "attributes": { "darkMode": "false" },
+  "users": [
+    {
+      "username": "service-account-handovers-backend",
+      "enabled": true,
+      "serviceAccountClientId": "handovers-backend",
+      "clientRoles": {
+        "realm-management": [
+          "view-realm",
+          "view-users",
+          "manage-users",
+          "view-identity-providers",
+          "manage-identity-providers"
+        ]
+      }
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "handovers-backend",
+      "name": "Handovers",
+      "description": "The Handovers backend: signs people in (authorization code + PKCE) and, as a service account, provisions people and sign-in providers.",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "${KEYCLOAK_CLIENT_SECRET}",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "rootUrl": "${APP_PUBLIC_URL}",
+      "baseUrl": "/",
+      "redirectUris": ["${APP_PUBLIC_URL}/api/auth/callback"],
+      "webOrigins": [],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "${APP_PUBLIC_URL}/login"
+      },
+      "defaultClientScopes": ["basic", "profile", "email", "roles", "web-origins", "acr"],
+      "optionalClientScopes": []
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{$SITE_ADDRESS} {
+	encode gzip zstd
+	# Keycloak's admin console and admin API stay private: the backend calls them inside Docker, and
+	# people reach the console over an SSH tunnel (deployment/README.md).
+	handle /auth/admin* {
+		respond 404
+	}
+	# Sign-in pages and tokens (Keycloak, the "auth" profile).
+	handle /auth/* {
+		reverse_proxy keycloak:8180
+	}
+	handle {
+		reverse_proxy frontend:80
+	}
+}
