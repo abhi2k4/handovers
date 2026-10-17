@@ -46,7 +46,7 @@ export function Hero() {
     <header id="top" data-snap="start" className="pt-32 sm:pt-44">
       <div className="wrap text-center">
         <motion.p {...rise(0.05)} className="text-[15px] font-medium text-ink-2">
-          A seamless recruitment system for HRs
+          The company brain for HR
         </motion.p>
         <motion.h1 {...rise(0.12)} className="serif h-hero mt-5">
           People leave.
@@ -54,13 +54,13 @@ export function Hero() {
           <span className="lg:whitespace-nowrap">Their context shouldn&rsquo;t.</span>
         </motion.h1>
         <div className="mt-8 flex flex-col items-center gap-9">
-          <motion.p {...rise(0.24)} className="max-w-[34rem] text-[19px] leading-[1.55] text-ink-2">
-            Handovers remembers what everyone works on.
-            <br className="max-sm:hidden" /> When someone quits, the handover is already written.
+          <motion.p {...rise(0.24)} className="max-w-[44rem] text-[19px] leading-[1.55] text-ink-2">
+            Handovers learns how your company works, from the tools people already use.
+            <br className="max-sm:hidden" /> When someone resigns, everything HR needs is already written.
           </motion.p>
           <motion.div {...rise(0.34)} className="flex items-center justify-center gap-6">
             <a href={DEMO} className="btn btn-green btn-lg">
-              See the demo
+              See the live demo
             </a>
             <a href="#how" className="text-[15px] font-semibold text-ink underline-offset-4 hover:underline">
               How it works

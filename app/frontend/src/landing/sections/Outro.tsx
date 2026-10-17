@@ -28,10 +28,13 @@ export function Outro() {
         <Reveal className="relative">
           <h2 className="serif h-hook">
             Give your company
-            <br className="max-sm:hidden" /> a memory.
+            <br className="max-sm:hidden" /> a brain.
           </h2>
-          <a href={DEMO} className="btn btn-green btn-lg mt-12">
-            Try Handovers now
+          <p className="mx-auto mt-6 max-w-[30rem] text-[18px] leading-[1.6] text-ink-2">
+            The graph finds what matters, people confirm it, and nothing walks out the door.
+          </p>
+          <a href={DEMO} className="btn btn-green btn-lg mt-10">
+            Try the live demo
           </a>
         </Reveal>
       </div>
@@ -41,6 +44,7 @@ export function Outro() {
           <a href="#top" className="flex items-center gap-2">
             <img src={logo} alt="" className="h-5 w-auto" />
             <span className="text-[15px] font-semibold">Handovers</span>
+            <span className="text-[13px] text-ink-3">· Built on FalkorDB</span>
           </a>
           <nav className="flex gap-6 text-[14px] text-ink-2">
             <a href="#product" className="hover:text-ink">

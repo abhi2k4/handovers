@@ -96,7 +96,8 @@ function Writing({ p }: { p: MotionValue<number> }) {
       <div className="text-center lg:w-[40%] lg:shrink-0 lg:text-left">
         <h2 className="serif h-section mx-auto max-w-[14ch] lg:mx-0">Handovers that write themselves.</h2>
         <p className="mx-auto mt-5 max-w-[26rem] text-[17px] leading-[1.6] text-ink-2 max-sm:hidden lg:mx-0">
-          It reads the work as it happens. When someone resigns, the document is already there.
+          It reads the work as it happens, in chat, documents, tickets and customer records. When someone resigns, the
+          handover document is already written, ready for three signatures. Private notes never cross.
         </p>
         <ul className="mt-8 -ml-4 hidden flex-col gap-1 lg:flex">
           {SIGNALS.map((s, i) => (

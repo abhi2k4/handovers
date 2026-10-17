@@ -98,8 +98,8 @@ function Answer() {
 
 const MOMENTS = [
   { date: '12 Oct', title: 'The day she resigns', text: 'HR and the manager hear on WhatsApp, with what is at risk.' },
-  { date: '13 Oct – 3 Nov', title: 'The notice period', text: 'Clearance, the handover and the letters fill themselves in.' },
-  { date: '4 Nov', title: 'The successor’s first day', text: 'Ask anything. Every answer names its source.' },
+  { date: '13 Oct – 3 Nov', title: 'The notice period', text: 'Exit interview, clearance and the relieving letter, each with an owner. Nothing drafted by hand.' },
+  { date: '4 Nov', title: 'The successor’s first day', text: 'A first-month plan, and answers that name their source and who approved them.' },
 ]
 // Where each moment is fully on stage, as scroll progress.
 const CUT = [0.3, 0.66]
@@ -186,7 +186,11 @@ export function HowItWorks() {
     <div id="how" className="section">
       <div data-snap="start" className="wrap pb-10 text-center sm:pb-16">
         <Reveal>
-          <h2 className="serif h-hook">For the people who stay.</h2>
+          <h2 className="serif h-hook">From resignation to relieving letter.</h2>
+          <p className="mx-auto mt-6 max-w-[38rem] text-[18px] leading-[1.6] text-ink-2">
+            The exit interview, handover document, ramp-up plan, clearance, relieving letter and, if there is no backup, a
+            hiring kit. One place, with an owner for every step.
+          </p>
         </Reveal>
       </div>
       <Scene beats={3}>{(p) => <Timeline p={p} />}</Scene>

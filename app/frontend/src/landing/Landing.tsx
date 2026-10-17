@@ -13,7 +13,7 @@ import { Product } from './sections/Product'
 /** The landing page, at /. The app lives under /dashboard. */
 export default function Landing() {
   useEffect(() => {
-    document.title = "Handovers: people leave, their context shouldn't"
+    document.title = "Handovers: the company brain for HR"
     const lenis = new Lenis({ lerp: 0.12 })
     // A short wheel or trackpad flick glides to the next section or photo; touch scrolls natively.
     let snap: Snap | undefined

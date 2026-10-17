@@ -55,9 +55,13 @@ export function Memory() {
     <section data-snap="start" className="bg-dark py-28 text-white sm:py-36">
       <div ref={ref} className="wrap">
         <h2 className="serif h-hook text-center">
-          Perfect company
-          <br className="max-sm:hidden" /> memory.
+          A memory you
+          <br className="max-sm:hidden" /> can check.
         </h2>
+        <p className="mx-auto mt-6 max-w-[36rem] text-center text-[18px] leading-[1.6] text-white/60">
+          The 18 questions a successor asks, answered three ways. Only the graph knows which figure is current and which
+          note is private.
+        </p>
 
         <div role="radiogroup" aria-label="Who answers" className="mx-auto mt-14 flex w-fit max-w-full gap-1 overflow-x-auto rounded-full bg-white/8 p-1 sm:mt-20">
           {SETUPS.map((s) => (

@@ -56,7 +56,7 @@ function Vanish({ p }: { p: MotionValue<number> }) {
         </div>
         <h2 className="serif h-section mx-auto mt-7 max-w-[16ch]">When someone leaves, their work leaves with them.</h2>
         <motion.p style={{ opacity: after, y: afterY }} className="mt-7 max-w-[30rem] text-[18px] leading-[1.6] text-ink-2">
-          Admin access only she had. Reasons nobody wrote down. Most of it is gone by the last day.
+          Admin access only she had. Reasons nobody wrote down. Clients only she knows. By the last day, most of it is gone.
         </motion.p>
       </div>
     </div>
