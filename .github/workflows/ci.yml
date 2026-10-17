@@ -1,0 +1,161 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app/backend
+    services:
+      falkordb:
+        image: falkordb/falkordb:6.0.1
+        env:
+          REDIS_ARGS: "--requirepass handovers-ci"
+          REDISCLI_AUTH: "handovers-ci"
+          BROWSER: "0"
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+    env:
+      FALKORDB_HOST: localhost
+      FALKORDB_PORT: "6379"
+      FALKORDB_PASSWORD: handovers-ci
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.2.0  # setup-uv publishes no major-version alias tags
+      - name: Install (locked)
+        run: uv sync --frozen
+      - name: Lint
+        run: uv run ruff check .
+      - name: Format check
+        run: uv run ruff format --check .
+      - name: Type-check
+        run: uv run mypy
+      - name: Tests (unit + integration against FalkorDB)
+        run: uv run pytest
+      - name: pip requirement files match uv.lock
+        run: |
+          uv export --frozen --format requirements-txt --no-dev --no-hashes --no-annotate -o requirements.txt >/dev/null
+          uv export --frozen --format requirements-txt --all-groups --no-hashes --no-annotate -o requirements-dev.txt >/dev/null
+          git diff --exit-code -- requirements.txt requirements-dev.txt || {
+            echo "::error::requirements files are out of date. Run scripts/sync-requirements.sh (or .ps1) and commit."
+            exit 1
+          }
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app/frontend
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: app/frontend/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run build
+
+  compose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Full stack builds and serves (the two-command setup a new teammate runs)
+        run: |
+          python3 setup.py --yes
+          docker compose up -d --build --wait
+          curl -fsS http://localhost:8000/readyz
+          curl -fsS http://localhost:5173/api/status
+          curl -fsS -o /dev/null http://localhost:5173/
+          # Sign-in is on by default: Keycloak must be up and reachable from the backend.
+          curl -fsS http://localhost:5173/api/auth/config | grep -q '"available":true'
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs
+      - name: Tear down
+        if: always()
+        run: docker compose down -v
+
+  # Every developer OS must be able to set up, test and build the project. A change that only
+  # works on one platform fails here, before it reaches anyone else.
+  cross-platform:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.2.0  # setup-uv publishes no major-version alias tags
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: app/frontend/package-lock.json
+
+      - name: Shell scripts are executable and have LF line endings
+        if: runner.os == 'Linux'
+        run: |
+          bad=0
+          while read -r mode _ _ path; do
+            if [ "$mode" != "100755" ]; then echo "::error file=$path::not executable (git update-index --chmod=+x $path)"; bad=1; fi
+          done < <(git ls-files -s '*.sh')
+          if git ls-files --eol | grep -q '^i/crlf'; then
+            git ls-files --eol | grep '^i/crlf'; echo "::error::files committed with CRLF"; bad=1
+          fi
+          exit $bad
+
+      - name: Backend setup with uv
+        working-directory: app/backend
+        run: |
+          uv sync --frozen
+          uv run pytest   # integration tests skip here (no FalkorDB on this runner)
+
+      - name: Backend setup with pip
+        working-directory: app/backend
+        run: |
+          python -m venv .pipvenv
+          if [ "$RUNNER_OS" = "Windows" ]; then PY=.pipvenv/Scripts/python; else PY=.pipvenv/bin/python; fi
+          "$PY" -m pip install -q -r requirements-dev.txt
+          "$PY" -m pytest -q
+
+      - name: Requirement sync script (bash)
+        if: runner.os != 'Windows'
+        run: |
+          scripts/sync-requirements.sh
+          git diff --exit-code -- app/backend/requirements.txt app/backend/requirements-dev.txt
+
+      - name: Requirement sync script (PowerShell)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          ./scripts/sync-requirements.ps1
+          git diff --exit-code -- app/backend/requirements.txt app/backend/requirements-dev.txt
+
+      - name: Frontend install and build
+        working-directory: app/frontend
+        run: |
+          npm ci
+          npm run build
