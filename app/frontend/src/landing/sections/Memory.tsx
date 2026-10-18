@@ -52,7 +52,7 @@ export function Memory() {
   const leaked = outcomes.filter((o) => o === 'leaked').length
 
   return (
-    <section data-snap="start" className="bg-dark py-28 text-white sm:py-36">
+    <section id="memory" data-snap="start" className="bg-dark py-28 text-white sm:py-36">
       <div ref={ref} className="wrap">
         <h2 className="serif h-hook text-center">
           A memory you

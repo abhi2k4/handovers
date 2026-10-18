@@ -35,6 +35,9 @@ export function Nav() {
           <a href="#how" className="transition-colors hover:text-ink">
             How it works
           </a>
+          <a href="#film" className="transition-colors hover:text-ink">
+            Film
+          </a>
         </div>
         <div className="ml-auto flex items-center gap-2">
           <a href={DEMO} className="btn btn-green !h-9 !px-4 text-[13.5px] whitespace-nowrap">

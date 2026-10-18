@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { Mascots } from './components/Mascots'
 import { Nav } from './components/Nav'
 import './landing.css'
+import { Film } from './sections/Film'
 import { Hero } from './sections/Hero'
 import { HowItWorks } from './sections/HowItWorks'
 import { Memory } from './sections/Memory'
@@ -51,6 +52,7 @@ export default function Landing() {
         <Problem />
         <Product />
         <HowItWorks />
+        <Film />
         <Memory />
       </main>
       <Outro />

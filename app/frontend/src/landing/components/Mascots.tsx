@@ -50,14 +50,18 @@ interface Layout {
 }
 
 function measure(): Layout | null {
-  const els = [...document.querySelectorAll<HTMLElement>('.landing main > *'), document.querySelector<HTMLElement>('.landing > footer')]
-  if (els.length < 6 || els.some((e) => !e)) return null
+  const ids = ['top', 'problem', 'product', 'how', 'memory']
+  const els = [...ids.map((id) => document.getElementById(id)), document.querySelector<HTMLElement>('.landing > footer')]
+  if (els.some((e) => !e)) return null
   const W = window.innerWidth
   const H = window.innerHeight
   const top = (e: HTMLElement) => e.getBoundingClientRect().top + window.scrollY
   const t = (els as HTMLElement[]).map(top)
+  // The handover finishes before the film.
+  const film = document.getElementById('film')
+  const howEnd = film ? top(film) : t[4]
   const max = document.documentElement.scrollHeight - H
-  const stops = [0, t[1] - H * 0.5, t[2] - H * 0.5, t[3] - H * 0.3, t[3] + (t[4] - t[3]) * 0.45, t[4] - H * 0.5, max - 4]
+  const stops = [0, t[1] - H * 0.5, t[2] - H * 0.5, t[3] - H * 0.3, t[3] + (howEnd - t[3]) * 0.45, t[4] - H * 0.5, max - 4]
   for (let i = 1; i < stops.length; i++) stops[i] = Math.max(stops[i], stops[i - 1] + 1)
   return { W, S: W < 640 ? 58 : W < 1024 ? 84 : 104, stops }
 }
@@ -119,18 +123,27 @@ function Stage({ W, S, stops }: Layout) {
   const sink = useRef({ blue: 0, green: 0 })
   const active = useRef(0)
   const [awake, setAwake] = useState(true)
+  const watching = useRef(false)
+  useEffect(() => {
+    const onVideo = (e: Event) => (watching.current = (e as CustomEvent<boolean>).detail)
+    window.addEventListener('handovers:video', onVideo)
+    return () => window.removeEventListener('handovers:video', onVideo)
+  }, [])
   useAnimationFrame((t) => {
     const raw = Math.abs(velocity.get())
     const v = Math.min(raw / 1400, 1)
     if (raw > 30) active.current = t
     // The intro and the finale stay up; everywhere else they duck while the reader reads.
     const s0 = stopRef.current
-    const resting = s0 !== 0 && s0 !== 6 && t - active.current > 2600
+    // While the demo video plays they leave the screen entirely, until the reader scrolls on.
+    if (watching.current && s0 >= 5) watching.current = false
+    const away = watching.current
+    const resting = away || (s0 !== 0 && s0 !== 6 && t - active.current > 2600)
     if (resting === awake) setAwake(!resting)
     for (const who of ['blue', 'green'] as Who[]) {
       const ph = who === 'blue' ? 0 : 1.7
       const k = sink.current
-      k[who] += ((resting ? H * 0.6 : 0) - k[who]) * 0.07
+      k[who] += ((away ? H * 1.3 : resting ? H * 0.6 : 0) - k[who]) * 0.07
       bob[who].set(-Math.abs(Math.sin(t / 110 + ph)) * 9 * v + jump[who].get() + k[who])
       tilt[who].set(Math.sin(t / 220 + ph) * 5 * v)
       const s = stopRef.current
