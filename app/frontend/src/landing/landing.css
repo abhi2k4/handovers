@@ -192,3 +192,12 @@
       0 12px 32px -12px rgba(22, 24, 29, 0.28);
   }
 }
+
+/* The mascots blink every few seconds. */
+@keyframes mascot-blink {
+  0%, 93%, 100% { transform: scaleY(1); }
+  96% { transform: scaleY(0.1); }
+}
+.landing .mascot-blink {
+  animation: mascot-blink 4.2s infinite;
+}

@@ -1,6 +1,7 @@
 import Lenis from 'lenis'
 import Snap from 'lenis/snap'
 import { useEffect } from 'react'
+import { Mascots } from './components/Mascots'
 import { Nav } from './components/Nav'
 import './landing.css'
 import { Hero } from './sections/Hero'
@@ -13,7 +14,7 @@ import { Product } from './sections/Product'
 /** The landing page, at /. The app lives under /dashboard. */
 export default function Landing() {
   useEffect(() => {
-    document.title = "Handovers: the company brain that remembers everyone's work"
+    document.title = "Handovers: the company brain for HR"
     const lenis = new Lenis({ lerp: 0.12 })
     // A short wheel or trackpad flick glides to the next section or photo; touch scrolls natively.
     let snap: Snap | undefined
@@ -53,6 +54,7 @@ export default function Landing() {
         <Memory />
       </main>
       <Outro />
+      <Mascots />
     </div>
   )
 }

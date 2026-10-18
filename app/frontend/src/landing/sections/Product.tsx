@@ -27,8 +27,8 @@ function Raw({ s, t, p }: { s: Signal; t: number; p: MotionValue<number> }) {
   const lock = useTransform(p, [t, t + 0.03], [0, 1])
   const blur = useTransform(p, [t, t + 0.04], ['blur(0px)', 'blur(5px)'])
   return (
-    <motion.li style={{ opacity, backgroundColor: bg }} className="rounded-[14px] px-4 py-3">
-      <div className="flex items-center gap-2 text-[12.5px] text-ink-3">
+    <motion.li style={{ opacity, backgroundColor: bg }} className="rounded-[12px] px-3.5 py-2">
+      <div className="flex items-center gap-2 text-[11.5px] text-ink-3">
         <motion.span style={{ color }} className="flex">
           <Glyph tool={s.tool} className="size-3.5" />
         </motion.span>
@@ -42,7 +42,7 @@ function Raw({ s, t, p }: { s: Signal; t: number; p: MotionValue<number> }) {
           </motion.span>
         )}
       </div>
-      <motion.p style={s.line ? undefined : { filter: blur }} className="font-system mt-1 text-[14px] leading-[1.45] text-ink">
+      <motion.p style={s.line ? undefined : { filter: blur }} className="font-system mt-0.5 truncate text-[13px] leading-[1.45] text-ink">
         {s.raw}
       </motion.p>
     </motion.li>
@@ -55,22 +55,23 @@ function Line({ s, t, p, head }: { s: Signal; t: number; p: MotionValue<number>;
   const clip = useTransform(wipe, (w) => `inset(-4px ${w}% -4px 0)`)
   const meta = useTransform(p, [t + 0.06, t + 0.09], [0, 1])
   const headOpacity = useTransform(p, [t - 0.01, t + 0.02], [0, 1])
+  const rule = useTransform(p, [t + 0.01, t + 0.07], ['rgba(22,24,29,0)', 'rgba(22,24,29,0.1)'])
   return (
     <div>
       {head && (
-        <motion.div style={{ opacity: headOpacity }} className="pt-5 pb-1 text-[11.5px] max-sm:hidden font-semibold tracking-[0.06em] text-ink-3 uppercase">
+        <motion.div style={{ opacity: headOpacity }} className="pt-3.5 pb-0.5 text-[10.5px] max-sm:hidden font-semibold tracking-[0.07em] text-ink-3 uppercase">
           {s.line!.section}
         </motion.div>
       )}
-      <div className="border-b border-line py-2 sm:py-2.5">
-        <motion.p style={{ clipPath: clip }} className="text-[14.5px] leading-snug text-ink sm:text-[15px]">
+      <motion.div style={{ borderColor: rule }} className="flex items-baseline gap-4 border-b py-2">
+        <motion.p style={{ clipPath: clip }} className="min-w-0 flex-1 text-[14px] leading-snug text-ink">
           {s.line!.text}
         </motion.p>
-        <motion.div style={{ opacity: meta }} className="mt-1 flex max-sm:hidden items-center gap-1.5 text-[12px] text-ink-3">
+        <motion.div style={{ opacity: meta }} className="flex shrink-0 items-center gap-1.5 text-[11.5px] text-ink-3 max-sm:hidden">
           <Glyph tool={s.tool} className="size-3" />
           {s.where}
         </motion.div>
-      </div>
+      </motion.div>
     </div>
   )
 }
@@ -80,11 +81,11 @@ function Signature({ role, name, t, p }: { role: string; name: string; t: number
   const clip = useTransform(wipe, (w) => `inset(-8px ${w}% -8px 0)`)
   return (
     <div className="min-w-0 flex-1">
-      <motion.div style={{ clipPath: clip }} className="serif h-8 truncate text-[22px] text-green-deep italic sm:text-[26px]">
+      <motion.div style={{ clipPath: clip }} className="serif h-7 truncate text-[20px] text-green-deep italic sm:text-[22px]">
         <span className="sm:hidden">{name.split(' ')[0]}</span>
         <span className="max-sm:hidden">{name}</span>
       </motion.div>
-      <div className="mt-1 border-t border-ink/25 pt-1.5 text-[11.5px] text-ink-3">{role}</div>
+      <div className="mt-1 border-t border-ink/25 pt-1 text-[11px] text-ink-3">{role}</div>
     </div>
   )
 }
@@ -92,25 +93,25 @@ function Signature({ role, name, t, p }: { role: string; name: string; t: number
 function Writing({ p }: { p: MotionValue<number> }) {
   const lined = SIGNALS.map((s, i) => ({ s, t: at(i) })).filter((x) => x.s.line)
   return (
-    <div className="wrap flex h-full flex-col justify-center pt-20 pb-6 lg:flex-row lg:items-center lg:gap-16 lg:pt-16">
-      <div className="text-center lg:w-[40%] lg:shrink-0 lg:text-left">
-        <h2 className="serif h-section mx-auto max-w-[14ch] lg:mx-0">Handovers that write themselves.</h2>
-        <p className="mx-auto mt-5 max-w-[26rem] text-[17px] leading-[1.6] text-ink-2 max-sm:hidden lg:mx-0">
+    <div className="wrap flex h-full max-w-[1120px]! flex-col justify-center pt-20 pb-6 lg:flex-row lg:items-center lg:gap-14 lg:pt-14">
+      <div className="text-center lg:w-[42%] lg:shrink-0 lg:text-left">
+        <h2 className="serif mx-auto max-w-[14ch] text-[clamp(2.25rem,3.6vw,3.4rem)] leading-[1.02] tracking-[-0.03em] lg:mx-0">Handovers that write themselves.</h2>
+        <p className="mx-auto mt-4 max-w-[25rem] text-[16px] leading-[1.6] text-ink-2 max-sm:hidden lg:mx-0">
           It reads the work as it happens, in chat, documents, tickets and customer records. When someone resigns, the
           handover document is already written, ready for three signatures. Private notes never cross.
         </p>
-        <ul className="mt-8 -ml-4 hidden flex-col gap-1 lg:flex">
+        <ul className="mt-6 -ml-3.5 hidden flex-col gap-0.5 lg:flex">
           {SIGNALS.map((s, i) => (
             <Raw key={s.raw} s={s} t={at(i)} p={p} />
           ))}
         </ul>
       </div>
 
-      <div className="mx-auto mt-6 w-full max-w-[34rem] min-w-0 rounded-[18px] bg-white p-5 shadow-shot sm:p-8 lg:mt-0 lg:max-w-none lg:flex-1">
-        <div className="flex items-baseline justify-between gap-4 border-b border-line pb-4">
+      <div className="mx-auto mt-6 w-full max-w-[34rem] min-w-0 rounded-[18px] bg-white p-5 shadow-shot sm:px-7 sm:py-6 lg:mt-0 lg:flex-1">
+        <div className="flex items-baseline justify-between gap-4 border-b border-line pb-3">
           <div>
             <div className="text-[12px] text-ink-3">Handover document</div>
-            <div className="serif mt-0.5 text-[26px] leading-tight sm:text-[30px]">Nisha Verma</div>
+            <div className="serif mt-0.5 text-[24px] leading-tight sm:text-[26px]">Nisha Verma</div>
           </div>
           <div className="text-right text-[12px] leading-[1.5] text-ink-3">
             Last day 3 Nov
@@ -118,12 +119,12 @@ function Writing({ p }: { p: MotionValue<number> }) {
             To Ananya Pillai
           </div>
         </div>
-        <div className="-mt-1 min-h-[250px] sm:min-h-[340px]">
+        <div className="min-h-[230px] sm:min-h-[280px]">
           {lined.map(({ s, t }, i) => (
             <Line key={s.raw} s={s} t={t} p={p} head={i === 0 || lined[i - 1].s.line!.section !== s.line!.section} />
           ))}
         </div>
-        <div className="mt-6 flex gap-4 sm:gap-6">
+        <div className="mt-5 flex gap-4 sm:gap-5">
           {SIGN.map((x) => (
             <Signature key={x.role} role={x.role} name={x.name} t={x.at} p={p} />
           ))}
