@@ -9,11 +9,9 @@
 <h3 align="center">People leave. Their context shouldn't.</h3>
 
 <p align="center">
-  <a href="https://handovers.gracelabs.in"><b>Live app →</b></a>
-</p>
-
-<p align="center">
-  <a href="https://youtu.be/aR-2wMN9TR4"><img src="https://img.youtube.com/vi/aR-2wMN9TR4/maxresdefault.jpg" alt="Watch the Handovers demo video on YouTube" width="720"></a>
+  <a href="https://handovers.gracelabs.in"><b>Live app</b></a>
+  &nbsp;&nbsp;
+  <a href="https://youtu.be/aR-2wMN9TR4"><b>Demo video</b></a>
 </p>
 
 Someone resigns. Their notice period is 30 days. HR has to hire a replacement for a role they
