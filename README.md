@@ -6,6 +6,15 @@
 
 **People leave. Their context shouldn't.**
 
+<p align="center">
+  <a href="https://handovers.gracelabs.in"><b>Live app</b></a> ·
+  <a href="https://youtu.be/aR-2wMN9TR4"><b>Demo video</b></a>
+</p>
+
+<p align="center">
+  <a href="https://youtu.be/aR-2wMN9TR4"><img src="https://img.youtube.com/vi/aR-2wMN9TR4/maxresdefault.jpg" alt="Watch the Handovers demo video on YouTube" width="720"></a>
+</p>
+
 Someone resigns. Their notice period is 30 days. HR has to hire a replacement for a role they
 don't fully understand, and make sure nothing the person did is lost. Usually the old job
 description is three years out of date, the hiring manager is too busy to rewrite it, and the
@@ -69,11 +78,6 @@ Around those, it keeps the handover on track and the next one cheaper:
 
 Built for **[Graph Hacks: Context for AI Agents](https://www.wemakedevs.org/hackathons/falkordb)**
 (WeMakeDevs × FalkorDB), **Track 03: Company Brain**.
-
-| | |
-|---|---|
-| Live | https://handovers.gracelabs.in |
-| Demo video | https://youtu.be/aR-2wMN9TR4 |
 
 ## Screenshots
 
