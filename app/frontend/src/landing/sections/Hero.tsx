@@ -46,7 +46,7 @@ export function Hero() {
     <header id="top" data-snap="start" className="pt-32 sm:pt-44">
       <div className="wrap text-center">
         <motion.p {...rise(0.05)} className="text-[15px] font-medium text-ink-2">
-          The company brain for HR
+          The company brain that remembers everyone's work
         </motion.p>
         <motion.h1 {...rise(0.12)} className="serif h-hero mt-5">
           People leave.
