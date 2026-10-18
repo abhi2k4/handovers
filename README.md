@@ -72,7 +72,7 @@ Built for **[Graph Hacks: Context for AI Agents](https://www.wemakedevs.org/hack
 
 | | |
 |---|---|
-| Live | https://handovers.omisaur.app (also https://34-100-187-124.sslip.io) |
+| Live | https://handovers.omisaur.app |
 | Demo video | *to be added* |
 
 ## Screenshots
