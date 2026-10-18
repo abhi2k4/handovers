@@ -72,8 +72,8 @@ Built for **[Graph Hacks: Context for AI Agents](https://www.wemakedevs.org/hack
 
 | | |
 |---|---|
-| Live | https://handovers.omisaur.app |
-| Demo video | *to be added* |
+| Live | https://handovers.gracelabs.in |
+| Demo video | https://youtu.be/aR-2wMN9TR4 |
 
 ## Screenshots
 
@@ -323,7 +323,7 @@ Screening outputs criteria and evidence, never a candidate score.
 
 - [ ] Public repository with this README (setup + graph data model)
 - [x] Cypher queries used ([`graph/queries/`](graph/queries/))
-- [ ] Demo video
+- [x] Demo video ([YouTube](https://youtu.be/aR-2wMN9TR4))
 - [x] Live deployment and local setup instructions
 - [x] Track selected: Track 03, Company Brain
 - [x] AI-assistance disclosure (below)
