@@ -2,13 +2,14 @@
   <img src="assets/logos/logo-wobg.png" alt="Handovers logo" width="360">
 </p>
 
-# Handovers
+<p align="center">
+  <img src="assets/logos/wordmark.svg" alt="Handovers" width="420">
+</p>
 
-**People leave. Their context shouldn't.**
+<h3 align="center">People leave. Their context shouldn't.</h3>
 
 <p align="center">
-  <a href="https://handovers.gracelabs.in"><b>Live app</b></a> ·
-  <a href="https://youtu.be/aR-2wMN9TR4"><b>Demo video</b></a>
+  <a href="https://handovers.gracelabs.in"><b>Live app →</b></a>
 </p>
 
 <p align="center">
