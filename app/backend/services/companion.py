@@ -426,6 +426,10 @@ def _citation(c: dict[str, Any]) -> dict[str, Any]:
         "previous": c.get("previous_value"),
         "valid_from": c.get("valid_from"),
         "evidence": (c.get("evidence") or [])[:4],
+        # How much to trust it: noisy-OR over its sources (knowledge_confidence.cypher), and how
+        # many independent sources back it. None for items that are not knowledge.
+        "confidence": c.get("confidence"),
+        "sources": c.get("sources"),
     }
 
 

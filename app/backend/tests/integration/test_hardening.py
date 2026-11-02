@@ -164,3 +164,13 @@ async def test_running_a_departure_early_puts_it_back_for_the_last_day(graph: Gr
     assert after["run_at"] == (await svc.get(graph, hid))["effective_at"]
     emp = await graph.one("successor_candidate", {"id": "emp:rohan"})
     assert emp is not None and emp["status"] != "departed"
+
+
+@pytest.mark.asyncio(loop_scope="module")
+async def test_cited_knowledge_says_how_much_to_trust_it(graph: Graph, llm: LLM) -> None:
+    out = await companion.ask(graph, llm, "emp:nisha", "What is the blended CAC target?")
+    knowledge = [c for c in out["citations"] if c.get("confidence") is not None]
+    assert knowledge, out["citations"]
+    for c in knowledge:
+        assert 0 < c["confidence"] <= 0.99
+        assert c["sources"] >= 1

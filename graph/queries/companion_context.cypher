@@ -14,6 +14,6 @@ OPTIONAL MATCH (from:Employee {id: kn.from_id})
 OPTIONAL MATCH (ap:Approval {id: kn.approval_id})-[:BY]->(approver:Employee)
 RETURN k.id AS id, k.kind AS kind, k.title AS title, k.rationale AS rationale, k.value AS value,
        k.steps AS steps, k.valid_from AS valid_from, k.valid_to AS valid_to,
-       k.confidence AS confidence, kn.via AS via, from.name AS from_name, ap.at AS approved_at,
+       k.confidence AS confidence, k.sources AS sources, kn.via AS via, from.name AS from_name, ap.at AS approved_at,
        approver.name AS approved_by, evidence, d.id AS decision_id, d.title AS decision,
        d.rationale AS decision_rationale, prev.value AS previous_value, prev.title AS previous_title
