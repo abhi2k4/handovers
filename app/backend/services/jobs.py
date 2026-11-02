@@ -139,47 +139,65 @@ async def ensure_recurring(graph: Graph) -> None:
 
 
 async def run_due(graph: Graph, limit: int = 20) -> list[dict[str, Any]]:
-    """Claim and run every due job once. Returns what ran (for the API and tests)."""
+    """Claim and run every due job once. Returns what ran (for the API and tests).
+
+    Each job is isolated: a failure while running it, or while recording the result, never stops
+    the jobs claimed after it, and a recurring job is always scheduled again.
+    """
     now = now_ms()
     ran = []
     for job in await graph.run("job_claim", {"now": now, "limit": limit}):
-        handler = HANDLERS.get(job["kind"])
         try:
-            if handler is None:
-                raise ValueError(f"unknown job kind {job['kind']}")
-            result = await handler(graph, job)
-            await graph.run(
-                "job_finish",
-                {
-                    "id": job["id"],
-                    "status": "done",
-                    "now": now_ms(),
-                    "result": json.dumps(result),
-                    "error": None,
-                    "retry_at": None,
-                },
-            )
-            ran.append({**job, "status": "done", "result": result})
-        except Exception as exc:  # a failed job never stops the worker
-            again = retry_at(now_ms(), int(job.get("attempts") or 1))
-            await graph.run(
-                "job_finish",
-                {
-                    "id": job["id"],
-                    "status": "queued" if again else "failed",
-                    "now": now_ms(),
-                    "result": None,
-                    "error": str(exc)[:500],
-                    "retry_at": again,
-                },
-            )
-            log.warning("job_failed", job=job["id"], kind=job["kind"], error=str(exc))
-            ran.append({**job, "status": "queued" if again else "failed", "error": str(exc)})
-            continue
-        if job["kind"] in RECURRING:
+            ran.append(await _run_one(graph, job))
+        except Exception as exc:  # recording the outcome failed (e.g. FalkorDB blip)
+            log.warning("job_finish_failed", job=job["id"], kind=job["kind"], error=str(exc))
+            ran.append({**job, "status": "running", "error": str(exc)})
+        if job["kind"] in RECURRING and ran[-1]["status"] != "queued":
             # Next run after the one just due, so a pinned demo clock does not loop on the same slot.
-            await schedule_recurring(graph, job["kind"], max(now, int(job["run_at"])) + 60_000)
+            try:
+                await schedule_recurring(graph, job["kind"], max(now, int(job["run_at"])) + 60_000)
+            except Exception as exc:
+                log.warning("job_reschedule_failed", kind=job["kind"], error=str(exc))
     return ran
+
+
+async def _run_one(graph: Graph, job: dict[str, Any]) -> dict[str, Any]:
+    handler = HANDLERS.get(job["kind"])
+    try:
+        if handler is None:
+            raise ValueError(f"unknown job kind {job['kind']}")
+        result = await handler(graph, job)
+    except Exception as exc:  # a failed job never stops the worker
+        again = retry_at(now_ms(), int(job.get("attempts") or 1))
+        status = "queued" if again else "failed"
+        await graph.run(
+            "job_finish",
+            {
+                "id": job["id"],
+                "status": status,
+                "now": now_ms(),
+                "result": None,
+                "error": str(exc)[:500],
+                "retry_at": again,
+            },
+        )
+        log.warning("job_failed", job=job["id"], kind=job["kind"], error=str(exc))
+        return {**job, "status": status, "error": str(exc)}
+    # A handler may say "not yet" (a departure run before the last day): queue it for then.
+    requeue = result.get("requeue_at") if isinstance(result, dict) else None
+    status = "queued" if requeue else "done"
+    await graph.run(
+        "job_finish",
+        {
+            "id": job["id"],
+            "status": status,
+            "now": now_ms(),
+            "result": json.dumps(result),
+            "error": None,
+            "retry_at": requeue,
+        },
+    )
+    return {**job, "status": status, "result": result}
 
 
 async def worker(graph: Graph, poll_seconds: float) -> None:

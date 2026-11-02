@@ -115,7 +115,10 @@ def to_markdown(name: str, data: bytes) -> str:
     ext = Path(name).suffix.lower()
     if ext in (".txt", ".md"):
         return data.decode("utf-8", errors="replace")
-    result = MarkItDown().convert_stream(io.BytesIO(data), file_extension=ext)
+    try:
+        result = MarkItDown().convert_stream(io.BytesIO(data), file_extension=ext)
+    except Exception as exc:  # corrupt or unsupported file: the caller answers 422
+        raise ValueError(f"Could not read this {ext or 'file'}: it may be damaged.") from exc
     return result.text_content or ""
 
 
@@ -273,8 +276,15 @@ def rule_extract(text: str, res: Resolver, person: str | None) -> list[Fact]:
 async def llm_extract(llm: LLM, text: str, res: Resolver, person: str | None) -> list[Fact]:
     out = await llm.json(EXTRACT_SYSTEM, f"Document:\n{text[:MAX_CHARS]}", EXTRACT_SCHEMA)
     facts = []
-    for raw in out.get("facts", []):
-        f, _ = _to_fact(raw, res, person, text)
+    for raw in out.get("facts") or []:
+        if not isinstance(raw, dict):
+            continue
+        try:
+            f, _ = _to_fact(raw, res, person, text)
+        except (KeyError, TypeError, ValueError):
+            # One malformed fact from the model (unknown kind, "high" as a confidence): skip it,
+            # keep the rest of the document.
+            continue
         if f:
             facts.append(f)
     return facts

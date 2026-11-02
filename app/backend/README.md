@@ -73,9 +73,15 @@ health (`/healthz`, `/readyz`, `/api/status`), meta, people, handovers, companio
 review, and me (`/api/me`, `/api/personas`, `/api/kpis`).
 
 **Access:** every rule is in `services/access.py` (HR runs handovers but cannot read answers or
-approve; only the leaver's manager approves; people ask and change privacy only as themselves). The
-demo caller comes from the `X-View-As: <employee id>` header; without it the API is unrestricted.
-This is a demo stand-in, not authentication (Keycloak later: `docs/identity-and-access.md`).
+approve; only the leaver's manager approves; people ask and change privacy only as themselves;
+uploads and the review queue are HR's). A signed-in session (Keycloak) always wins. Otherwise the
+demo caller comes from the `X-View-As: <employee id>` header, which is not authentication. Without
+either, the API is unrestricted only while sign-in is off (local development); once `KEYCLOAK_URL`
+is set, such a request may read (when `ALLOW_GUEST` is on) but every write gets 401.
+
+**Double clicks:** steps that check, then write over several queries (approve a transfer, create a
+ramp-up plan, confirm an answer) hold a per-handover lock (`core/locks.py`; one uvicorn worker).
+Opening a handover is a single guarded Cypher statement (`graph/queries/handover_create.cypher`).
 
 **LLM (optional):** set `LLM_PROVIDER=groq`, `LLM_MODEL=openai/gpt-oss-120b` and `GROQ_API_KEY` in
 the repo-root `.env` (key from https://console.groq.com/keys). Without a key everything still works with

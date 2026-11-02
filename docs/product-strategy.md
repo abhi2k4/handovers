@@ -275,7 +275,8 @@ correct items or mark them private. This is the answer to "is this surveillance?
 | Accounts to reassign | IT (in the sample company: HR & Admin) | **Built**; "Give admin to <successor>" adds the successor as admin and closes the account gap |
 
 Access rules live in one module, `app/backend/services/access.py`; the API reads the demo caller from
-the `X-View-As` header (no header = unrestricted, as before).
+the `X-View-As` header (no header = unrestricted in local development only; with sign-in on, a
+request with neither a session nor the header can read but not write).
 
 ### 10.4 Identity for the hackathon: "View as"
 

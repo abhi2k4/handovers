@@ -104,6 +104,11 @@ async def settings_for(
     return effective(s, c, await load(graph, account or c.id), account)
 
 
+def _is_address(key: str) -> bool:
+    """Settings that say where a request goes (jira_base_url, salesforce_instance_url, smtp_host)."""
+    return key.endswith(("_url", "_host"))
+
+
 async def _merged(
     graph: Graph, c: Connector, values: dict[str, str], account: str | None = None
 ) -> dict[str, str]:
@@ -113,9 +118,17 @@ async def _merged(
         raise InvalidConfig(f"Unknown settings: {', '.join(sorted(unknown))}")
     stored = await load(graph, account or c.id)
     secret_keys = {f.key for f in c.fields if f.secret}
+    # A stored secret goes only where it was entered for: once an address changes (the instance
+    # URL, the host), the secret must be typed again, or a "Test connection" could send
+    # the saved token to an address of the caller's choosing.
+    moved = any(
+        _is_address(k) and v.strip() and v.strip() != stored.get(k, "") for k, v in values.items()
+    )
     for key, value in values.items():
         value = value.strip()
         if key in secret_keys and not value:
+            if moved and stored.get(key):
+                raise InvalidConfig("Settings changed: enter the token or secret again.")
             continue
         stored[key] = value
     return stored

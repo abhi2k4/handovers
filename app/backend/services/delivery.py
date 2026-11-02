@@ -134,8 +134,15 @@ async def save(graph: Graph, channel: str, values: dict[str, str], by: str) -> N
         raise InvalidChannel("The port is a number, e.g. 587.")
     secret = {key for key, _, masked, _, _ in fields if masked}
     stored, _ = await _row(graph, channel)
+    # A new server address needs the password again: the stored one goes only where it was set for.
+    moved = any(
+        key.endswith("_host") and value.strip() and value.strip() != stored.get(key, "")
+        for key, value in values.items()
+    )
     for key, value in values.items():
         if key in secret and not value.strip():
+            if moved and stored.get(key):
+                raise InvalidChannel("The server changed: enter the password again.")
             continue
         stored[key] = value.strip()
     await graph.run(

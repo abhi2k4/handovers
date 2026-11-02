@@ -69,17 +69,34 @@ async def send(
         raise SendError("WhatsApp is not configured")
     url = f"https://graph.facebook.com/{s.whatsapp_api_version}/{s.whatsapp_phone_id}/messages"
     headers = {"Authorization": f"Bearer {s.whatsapp_token.get_secret_value()}"}
-    async with httpx.AsyncClient(timeout=10) as client:
-        r = await client.post(url, json=interactive(phone, body, buttons), headers=headers)
-        error = r.json().get("error", {}) if r.status_code >= 400 else {}
-        if error.get("code") == OUTSIDE_WINDOW and s.whatsapp_template:
-            r = await client.post(
-                url, json=template(phone, s.whatsapp_template, body), headers=headers
-            )
-            error = r.json().get("error", {}) if r.status_code >= 400 else {}
-        if r.status_code >= 400:
-            raise SendError(str(error.get("message") or r.text)[:300])
-        return str(r.json()["messages"][0]["id"])
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            r = await client.post(url, json=interactive(phone, body, buttons), headers=headers)
+            error = _error(r)
+            if error.get("code") == OUTSIDE_WINDOW and s.whatsapp_template:
+                r = await client.post(
+                    url, json=template(phone, s.whatsapp_template, body), headers=headers
+                )
+                error = _error(r)
+            if r.status_code >= 400:
+                raise SendError(str(error.get("message") or r.text)[:300])
+            return str(r.json()["messages"][0]["id"])
+    except SendError:
+        raise
+    except (httpx.HTTPError, ValueError, KeyError, IndexError, TypeError) as exc:
+        # Network failure or an unexpected reply (HTML 5xx): a failed send, not a failed request.
+        raise SendError(f"WhatsApp did not accept the message: {type(exc).__name__}") from exc
+
+
+def _error(r: httpx.Response) -> dict[str, Any]:
+    if r.status_code < 400:
+        return {}
+    try:
+        body = r.json()
+    except ValueError:
+        return {}
+    error = body.get("error") if isinstance(body, dict) else None
+    return error if isinstance(error, dict) else {}
 
 
 def button_reply(payload: dict[str, Any]) -> list[tuple[str, str]]:

@@ -60,7 +60,11 @@ async def put_policy(body: PolicyIn, graph: GraphDep, caller: CallerDep) -> dict
 @router.get("/jobs")
 async def list_jobs(graph: GraphDep, caller: CallerDep) -> list[dict[str, Any]]:
     """The queue: what waits and what ran, newest first."""
-    forbid(_can_edit(caller), "Only HR or the platform admin can see background jobs.")
+    # Looking is allowed to the platform admin as a View-as guest too; running one is not.
+    forbid(
+        _can_edit(caller) or access.can_view_setup(caller),
+        "Only HR or the platform admin can see background jobs.",
+    )
     rows = await graph.read("job_list", {"limit": 60})
     return [
         r

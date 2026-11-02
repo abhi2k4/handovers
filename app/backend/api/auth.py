@@ -17,7 +17,7 @@ from fastapi.responses import RedirectResponse
 
 from api.deps import SESSION_COOKIE, CallerDep, GraphDep, forbid
 from core import keycloak, security
-from core.clock import now_ms
+from core.clock import wall_ms
 from core.config import get_settings
 from identity import REGISTRY as IDENTITY
 from services import access, identity
@@ -141,7 +141,7 @@ async def callback(
         return _refuse(f"{who.email} is not in the company directory.")
 
     token = security.new_token()
-    now = now_ms()
+    now = wall_ms()  # the real clock: a pinned DEMO_NOW would make sessions never expire
     await graph.run(
         "session_create",
         {"employee": employee["id"], "hash": security.token_hash(token), "now": now,
@@ -160,7 +160,7 @@ async def session(request: Request, graph: GraphDep) -> dict[str, Any] | None:
     token = request.cookies.get(SESSION_COOKIE)
     if not token:
         return None
-    row = await graph.one("session_get", {"hash": security.token_hash(token), "now": now_ms()})
+    row = await graph.one("session_get", {"hash": security.token_hash(token), "now": wall_ms()})
     if row is None:
         return None
     return {"employee": row["employee"], "name": row["name"], "email": row["email"]}
@@ -173,7 +173,7 @@ async def logout(request: Request, response: Response, graph: GraphDep) -> dict[
     token = request.cookies.get(SESSION_COOKIE)
     id_token = None
     if token:
-        row = await graph.one("session_get", {"hash": security.token_hash(token), "now": now_ms()})
+        row = await graph.one("session_get", {"hash": security.token_hash(token), "now": wall_ms()})
         if row:
             id_token = row.get("id_token")
             await graph.run("session_end", {"employee": row["employee"]})
