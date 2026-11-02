@@ -1,7 +1,7 @@
 import { APP_BASE } from '../app/base'
 import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
-import { Link, useNavigate } from 'react-router'
+import { Link, useLocation, useNavigate } from 'react-router'
 import { useApi } from '../hooks/useApi'
 import { ViewAsContext, useViewAs, type AuthConfig, type Me, type Persona, type Session } from '../hooks/useViewAs'
 import { api } from '../lib/api'
@@ -18,8 +18,10 @@ export function ViewAsProvider({ children }: { children: ReactNode }) {
   const { data: session, loading: sessionLoading } = useApi<Session | null>('/auth/session')
   const [chosen, setState] = useState(getViewAs())
   const persona = session?.employee ?? chosen
-  // The query string only re-keys the request when the persona changes; the header carries it.
-  const { data } = useApi<Me | null>(`/me?as=${encodeURIComponent(persona)}`)
+  const { pathname } = useLocation()
+  // The query string re-keys the request when the persona or the page changes (the header carries
+  // the persona), so homes built from `me` (leaving, managing) are fresh after an action.
+  const { data, error: meError } = useApi<Me | null>(`/me?as=${encodeURIComponent(persona)}&r=${encodeURIComponent(pathname)}`)
   const me = persona && data?.id === persona ? data : null
 
   useEffect(() => {
@@ -35,7 +37,7 @@ export function ViewAsProvider({ children }: { children: ReactNode }) {
   const has = (role: string) => !persona || (me?.roles.includes(role) ?? false)
 
   return (
-    <ViewAsContext.Provider value={{ persona, setPersona, me, has, session: session ?? null, auth: auth ?? null, sessionLoading }}>
+    <ViewAsContext.Provider value={{ persona, setPersona, me, meError: me ? null : meError, has, session: session ?? null, auth: auth ?? null, sessionLoading }}>
       {children}
     </ViewAsContext.Provider>
   )
@@ -53,9 +55,14 @@ function SignedIn() {
 
   async function signOut() {
     setBusy(true)
-    const { logout_url } = await api.post<{ logout_url: string | null }>('/auth/logout')
+    let logoutUrl: string | null = null
+    try {
+      logoutUrl = (await api.post<{ logout_url: string | null }>('/auth/logout')).logout_url
+    } catch {
+      // The session may already be gone; go to the sign-in page either way.
+    }
     // Keycloak ends its own session too, then returns to /login.
-    window.location.assign(logout_url ?? `${APP_BASE}/login`)
+    window.location.assign(logoutUrl ?? `${APP_BASE}/login`)
   }
 
   return (

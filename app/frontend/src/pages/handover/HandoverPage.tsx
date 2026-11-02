@@ -65,7 +65,12 @@ export function HandoverPage() {
   const { data: h, error, loading, reload } = useApi<Handover>(`/handovers/${encodeURIComponent(id)}`)
   const { data: people } = useApi<PersonRow[]>('/people')
   const { data: meta } = useApi<Meta>('/meta')
-  const { data: readiness } = useApi<{ stages: Stage[] }>(`/handovers/${encodeURIComponent(id)}/readiness`)
+  const { data: readiness, reload: reloadReadiness } = useApi<{ stages: Stage[] }>(`/handovers/${encodeURIComponent(id)}/readiness`)
+  // After any action the stage pipeline moves too, not only the handover.
+  const refresh = () => {
+    reload()
+    reloadReadiness()
+  }
   const { persona, me, has } = useViewAs()
   const content = useRef<HTMLDivElement>(null)
   const confirmable = useConfirmable()
@@ -110,7 +115,7 @@ export function HandoverPage() {
     setPickError('')
     try {
       await confirmable.run((confirmed) => api.post(`/handovers/${encodeURIComponent(id)}/successor`, { successor_id: successor, confirmed }))
-      reload()
+      refresh()
     } catch (e) {
       setPickError(e instanceof Error ? e.message : 'Failed')
     }
@@ -134,7 +139,7 @@ export function HandoverPage() {
             <p className="text-[14px] text-ink-2">{h.title}</p>
           </div>
         </div>
-        <dl className="flex gap-10 text-[14px]">
+        <dl className="flex flex-wrap gap-x-10 gap-y-3 text-[14px]">
           {h.approver && h.status !== 'cancelled' && (
             <div>
               <dt className="text-[13px] text-ink-3">Approver</dt>
@@ -194,11 +199,11 @@ export function HandoverPage() {
       ) : (
         <div className="mb-10 flex flex-wrap items-center justify-between gap-3">
           {readiness && <Pipeline stages={readiness.stages} />}
-          <CancelHandover h={h} onDone={reload} />
+          <CancelHandover h={h} onDone={refresh} />
         </div>
       )}
 
-      <div className="grid gap-10 md:grid-cols-[176px_minmax(0,1fr)] xl:gap-14">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-10 md:grid-cols-[176px_minmax(0,1fr)] xl:gap-14">
         <nav className="md:sticky md:top-[88px] md:self-start" aria-label="Handover steps">
           <ul className="flex gap-1 overflow-x-auto md:flex-col md:gap-px">
             {steps.map((s) => {
@@ -238,8 +243,8 @@ export function HandoverPage() {
           {tab === 'kit' && <InterviewKitView id={h.id} />}
           {tab === 'plan' && <PlanView h={h} />}
           {tab === 'clearance' && <ClearanceView h={h} successorActive={people?.find((p) => p.id === h.successor_id)?.status === 'active'} />}
-          {tab === 'interview' && (redacted ? <InterviewProgress h={h} /> : <ExitInterview h={h} onChange={reload} />)}
-          {tab === 'transfer' && !hidden.has('transfer') && <TransferView h={h} people={people ?? []} onChange={reload} />}
+          {tab === 'interview' && (redacted ? <InterviewProgress h={h} /> : <ExitInterview h={h} onChange={refresh} />)}
+          {tab === 'transfer' && !hidden.has('transfer') && <TransferView h={h} people={people ?? []} onChange={refresh} />}
           {tab === 'ramp' &&
             !hidden.has('ramp') &&
             (h.successor ? (

@@ -1,5 +1,5 @@
 import { addTrace } from './trace'
-import { getViewAs } from './viewAs'
+import { getViewAs, setViewAs } from './viewAs'
 
 // Single place for HTTP calls. Every request is same-origin `/api/*`:
 // Vite proxies it to FastAPI in dev; nginx does the same in Docker.
@@ -41,6 +41,12 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
       }
     } catch {
       // keep the generic message
+    }
+    if (response.status === 401 && message.startsWith('Unknown person for View as') && getViewAs()) {
+      // The remembered View-as person no longer exists (sample data reloaded): forget them and
+      // start again, or every page would be refused.
+      setViewAs('')
+      window.location.reload()
     }
     throw new ApiError(response.status, message, confirm)
   }

@@ -143,7 +143,7 @@ function AnswerText({ text, muted }: { text: string; muted: boolean }) {
 }
 
 /** Whose memory this is and what it holds: the only place answers can come from. */
-function MemoryPanel({ p, onAsk }: { p: Profile; onAsk: (q: string) => void }) {
+function MemoryPanel({ p, onAsk, busy }: { p: Profile; onAsk: (q: string) => void; busy: boolean }) {
   const figures: [string, number][] = [
     ['Knowledge', p.counts.knowledge],
     ['Work', p.counts.work],
@@ -194,7 +194,8 @@ function MemoryPanel({ p, onAsk }: { p: Profile; onAsk: (q: string) => void }) {
               <li key={q}>
                 <button
                   onClick={() => onAsk(q)}
-                  className="w-full rounded-[4px] px-2.5 py-1.5 text-left text-[13px] text-ink-2 shadow-[inset_0_0_0_1px_var(--color-line)] transition-colors hover:bg-app hover:text-ink"
+                  disabled={busy}
+                  className="w-full rounded-[4px] px-2.5 py-1.5 text-left text-[13px] text-ink-2 shadow-[inset_0_0_0_1px_var(--color-line)] transition-colors hover:bg-app hover:text-ink disabled:cursor-wait disabled:opacity-60"
                 >
                   {q}
                 </button>
@@ -257,7 +258,8 @@ function Ask({ fallback }: { fallback: string }) {
   }, [turns])
 
   async function ask(q: string) {
-    if (!q.trim() || !as) return
+    // One question at a time: answers land on the last turn, so a second one would take its place.
+    if (!q.trim() || !as || busy) return
     setQuestion('')
     setBusy(true)
     setTurns((t) => [...t, { question: q }])
@@ -355,7 +357,7 @@ function Ask({ fallback }: { fallback: string }) {
           </>
         )}
       </div>
-      {as && profile && <MemoryPanel p={profile} onAsk={(q) => void ask(q)} />}
+      {as && profile && <MemoryPanel p={profile} busy={busy} onAsk={(q) => void ask(q)} />}
     </div>
   )
 }

@@ -183,7 +183,7 @@ export function JobDescriptionView({ id }: { id: string }) {
           }
           action={jd.diff.old_title}
         >
-          <div className="grid gap-10 border-t border-line pt-4 md:grid-cols-2">
+          <div className="grid grid-cols-[minmax(0,1fr)] gap-10 border-t border-line pt-4 md:grid-cols-2">
             <div>
               <div className="mb-2 text-[13px] text-ink-3">Missing from the old one</div>
               <ul className="flex flex-col gap-1.5 text-[14px]">

@@ -68,7 +68,7 @@ export function Screening({ id }: { id: string }) {
   }
 
   return (
-    <div className="grid gap-12 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-12 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
       <div className="flex flex-col gap-10">
         <CriteriaList title="Must have" list={kit.criteria.filter((c) => c.level === 'must')} />
         <CriteriaList title="Nice to have" list={kit.criteria.filter((c) => c.level === 'nice')} />

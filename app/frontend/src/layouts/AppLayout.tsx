@@ -6,6 +6,7 @@ import { CopilotBar } from '../components/Copilot'
 import { XrayButton } from '../components/Xray'
 import { ThemeSwitch } from '../components/ThemeSwitch'
 import { TechGraphButton } from '../components/TechGraph'
+import { Toaster } from '../components/Toaster'
 import { Tour } from '../components/Tour'
 import { IdentityPanel, ViewAsProvider } from '../components/ViewAs'
 import { useTour } from '../hooks/useTour'
@@ -39,9 +40,10 @@ function Shell() {
   const items = useNav()
   const { data: meta } = useApi<Meta>('/meta')
   const location = useLocation()
-  const { data: handovers } = useApi<{ status: string }[]>(`/handovers?r=${location.pathname}`)
-  const { data: review } = useApi<unknown[]>(`/review?r=${location.pathname}`)
-  const { data: alerts } = useApi<{ acted: string | null }[]>(persona && !me?.roles.includes('platform_admin') ? `/alerts?r=${location.pathname}` : null)
+  const { data: handovers } = useApi<{ status: string }[]>(`/handovers?as=${persona}&r=${location.pathname}`)
+  // The review queue is HR's (Sources); others would only get a 403.
+  const { data: review } = useApi<unknown[]>(me?.roles.includes('hr') || !persona ? `/review?as=${persona}&r=${location.pathname}` : null)
+  const { data: alerts } = useApi<{ acted: string | null }[]>(persona && !me?.roles.includes('platform_admin') ? `/alerts?as=${persona}&r=${location.pathname}` : null)
   const counts = {
     handovers: (handovers ?? []).filter((h) => h.status !== 'transferred').length,
     review: review?.length ?? 0,
@@ -61,7 +63,7 @@ function Shell() {
   }, [])
 
   // Sign-in required (no guest access): send anyone without a session to the login page.
-  if (auth?.sso && !auth.guest && !sessionLoading && !session) return <Navigate to="/login" replace />
+  if (auth?.sso && !auth.guest && !sessionLoading && !session) return <Navigate to={`/login?next=${encodeURIComponent(location.pathname + location.search)}`} replace />
 
   return (
     <div className="flex min-h-dvh bg-app">
@@ -149,7 +151,7 @@ function Shell() {
       <div className="flex min-w-0 flex-1 flex-col">
         <nav className="flex items-center gap-4 overflow-x-auto border-b border-line bg-page px-4 py-3 text-[14px] md:hidden">
           {items.map(({ to, label, end }) => (
-            <NavLink key={to} to={to} end={end} className={({ isActive }) => (isActive ? 'font-medium text-ink' : 'text-ink-2')}>
+            <NavLink key={to} to={to} end={end} className={({ isActive }) => `shrink-0 whitespace-nowrap ${isActive ? 'font-medium text-ink' : 'text-ink-2'}`}>
               {label}
             </NavLink>
           ))}
@@ -176,6 +178,7 @@ function Shell() {
       <ScrollRestoration />
       {menu && <CommandMenu open onClose={() => setMenu(false)} />}
       <Tour open={tour.open} onClose={tour.hide} />
+      <Toaster />
     </div>
   )
 }

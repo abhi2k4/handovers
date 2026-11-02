@@ -15,7 +15,7 @@ export function InterviewKitView({ id }: { id: string }) {
       </p>
       <ol className="border-t border-line">
         {kit.questions.map((q, i) => (
-          <li key={q.id} className="grid gap-x-6 border-b border-line py-6 md:grid-cols-[28px_minmax(0,1fr)]">
+          <li key={q.id} className="grid grid-cols-[minmax(0,1fr)] gap-x-6 border-b border-line py-6 md:grid-cols-[28px_minmax(0,1fr)]">
             <span className="num text-[14px] text-ink-3">{i + 1}</span>
             <div>
               <div className="mb-1.5 text-[13px] text-ink-3">{q.skill}</div>

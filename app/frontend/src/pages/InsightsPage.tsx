@@ -84,7 +84,7 @@ export function InsightsPage() {
       <Heading>Key-person risk and knowledge health</Heading>
       <StatBand figures={k.risk.map(figure)} />
 
-      <div className="grid items-start gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader title="Work with a backup, by team" meta="2+ holders" />
           <HBars
@@ -107,7 +107,7 @@ export function InsightsPage() {
         </Card>
       </div>
 
-      <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
         <Card>
           <CardHeader title="Handovers in progress" meta={k.handovers.length} />
           {k.handovers.length === 0 ? (

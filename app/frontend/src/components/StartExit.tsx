@@ -62,7 +62,14 @@ export function StartExit({ now, onClose }: { now: number; onClose: () => void }
       <div className="flex flex-col gap-4 text-[14px]">
         <label className="flex flex-col gap-1.5">
           <span className="font-medium">Who is leaving?</span>
-          <Select value={who} onChange={(e) => setWho(e.target.value)} aria-label="Who is leaving">
+          <Select
+            value={who}
+            onChange={(e) => {
+              setWho(e.target.value)
+              setSuccessor('') // the options depend on who is leaving
+            }}
+            aria-label="Who is leaving"
+          >
             <option value="">Choose a person</option>
             {active.map((p) => (
               <option key={p.id} value={p.id}>

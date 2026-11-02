@@ -78,7 +78,7 @@ export function LeadershipHome({ me }: { me: Me }) {
         </Card>
       )}
 
-      <div className="grid items-start gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader title="Work with a backup, by team" />
           <HBars

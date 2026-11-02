@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Plus, X } from '../components/icons'
 import { Button, Card, CardHeader, Chip, ErrorNote, Input, PageHeader, PageSkeleton, Select, TextArea } from '../components/ui'
 import { useApi } from '../hooks/useApi'
+import { READ_ONLY_HINT, useSetupReadOnly, useViewAs } from '../hooks/useViewAs'
 import { api } from '../lib/api'
 import { ago, date } from '../lib/format'
 
@@ -234,7 +235,10 @@ export function PolicyPage() {
 
 /** The background job queue: what runs on its own, when, and what happened. */
 function Jobs() {
-  const { data: jobs, reload } = useApi<Job[]>('/jobs')
+  const { data: jobs, error: jobsError, reload } = useApi<Job[]>('/jobs')
+  const { has } = useViewAs()
+  // The platform admin as a View-as guest looks only; HR always runs jobs.
+  const readOnly = useSetupReadOnly() && !has('hr')
   const { data: meta } = useApi<Meta>('/meta')
   const [busy, setBusy] = useState('')
   const now = meta?.now ?? 0
@@ -255,6 +259,8 @@ function Jobs() {
     <Card>
       <CardHeader title="Background jobs" meta={upcoming.length || undefined} right="Runs on its own" />
       <p className="-mt-2 mb-3 text-[14px] text-ink-3">The daily summary, last-day warnings, alerts held over quiet hours, departures and letters. Run one now to see it.</p>
+      {jobsError && <p className="mb-3 text-[14px] text-risk-text">{jobsError}</p>}
+      {!jobs && !jobsError && <p className="mb-3 text-[14px] text-ink-3">Loading jobs…</p>}
       <ul className="flex flex-col divide-y divide-line">
         {upcoming.map((j) => (
           <li key={j.id} className="flex items-center justify-between gap-3 py-2">
@@ -262,7 +268,13 @@ function Jobs() {
               <span className="block truncate text-[14px]">{j.label}</span>
               <span className="num block text-[12px] text-ink-3">{date(j.run_at, true)}{j.attempts ? ` · try ${j.attempts + 1}` : ''}</span>
             </span>
-            <Button variant="ghost" className="h-8 text-[13px]" onClick={() => void run(j.id)} disabled={busy === j.id}>
+            <Button
+              variant="ghost"
+              className="h-8 text-[13px]"
+              onClick={() => void run(j.id)}
+              disabled={busy === j.id || readOnly}
+              title={readOnly ? READ_ONLY_HINT : undefined}
+            >
               {busy === j.id ? 'Running…' : 'Run now'}
             </Button>
           </li>

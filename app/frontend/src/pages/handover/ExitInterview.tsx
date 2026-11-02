@@ -72,7 +72,7 @@ function Question({ gap, n, example, onSaved, can, hid }: { gap: Gap; n: number;
   }
 
   return (
-    <li className="grid gap-x-6 border-b border-line py-7 md:grid-cols-[28px_minmax(0,1fr)]">
+    <li className="grid grid-cols-[minmax(0,1fr)] gap-x-6 border-b border-line py-7 md:grid-cols-[28px_minmax(0,1fr)]">
       <span className="num text-[14px] text-ink-3">{n}</span>
       <div className="max-w-[42rem]">
         <div className="mb-1.5 flex flex-wrap items-center gap-2 text-[13px] text-ink-3">

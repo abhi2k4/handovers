@@ -185,7 +185,7 @@ export function PageSkeleton() {
         <Skeleton className="h-3 w-40" />
         <Skeleton className="h-6 w-[min(560px,90%)]" />
       </div>
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
         <div className="flex flex-col gap-3">
           {Array.from({ length: 6 }, (_, i) => (
             <Skeleton key={i} className="h-9" />
@@ -281,7 +281,7 @@ export function Card({ children, className = '' }: { children: ReactNode; classN
 
 export function CardHeader({ title, meta, right }: { title: ReactNode; meta?: ReactNode; right?: ReactNode }) {
   return (
-    <header className="-mx-5 -mt-5 mb-4 flex min-h-11 items-center justify-between gap-4 border-b border-line px-5 py-2.5">
+    <header className="-mx-5 -mt-5 mb-4 flex min-h-11 flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-line px-5 py-2.5">
       <h2 className="text-[14px] font-semibold tracking-[-0.01em]">
         {title}
         {meta !== undefined && <span className="ml-2 font-mono text-[12px] font-normal text-ink-3">{meta}</span>}

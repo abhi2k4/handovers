@@ -56,6 +56,8 @@ interface Actions {
   set: (key: string, status: Row['status']) => void
   /** Do the work in the graph: reassign the admin, or give the work to the successor. */
   hand: (r: Row) => void
+  /** An action is in flight: row buttons wait. */
+  busy: boolean
   successor: string | null
   /** Work can only go to someone who has already joined. */
   successorActive: boolean
@@ -84,27 +86,27 @@ function RowView({ r, c, a }: { r: Row; c: Clearance; a: Actions }) {
       </span>
       <span className="flex items-center gap-3 text-[13px] font-medium">
         {r.status === 'open' && c.can_mark && graphRow && a.successor && !a.proposed.has(r.target) && (
-          <button onClick={() => a.hand(r)} className="text-accent hover:underline">
+          <button onClick={() => a.hand(r)} disabled={a.busy} className="text-accent hover:underline disabled:opacity-50">
             {r.key.startsWith('admin:') ? `Give admin to ${first(a.successor)}` : `Give to ${first(a.successor)}`}
           </button>
         )}
         {r.status === 'open' && c.can_mark && !(graphRow && a.successor) && (
-          <button onClick={() => a.set(r.key, 'done')} className="text-accent hover:underline">
+          <button onClick={() => a.set(r.key, 'done')} disabled={a.busy} className="text-accent hover:underline disabled:opacity-50">
             Mark done
           </button>
         )}
         {r.status === 'done' && c.can_confirm && (
-          <button onClick={() => a.set(r.key, 'confirmed')} className="text-accent hover:underline">
+          <button onClick={() => a.set(r.key, 'confirmed')} disabled={a.busy} className="text-accent hover:underline disabled:opacity-50">
             Confirm
           </button>
         )}
         {r.status === 'done' && c.can_mark && (
-          <button onClick={() => a.set(r.key, 'open')} className="text-ink-3 hover:underline">
+          <button onClick={() => a.set(r.key, 'open')} disabled={a.busy} className="text-ink-3 hover:underline disabled:opacity-50">
             Undo
           </button>
         )}
         {r.status === 'confirmed' && !r.auto && c.can_confirm && (
-          <button onClick={() => a.set(r.key, 'done')} className="text-ink-3 hover:underline">
+          <button onClick={() => a.set(r.key, 'done')} disabled={a.busy} className="text-ink-3 hover:underline disabled:opacity-50">
             Reopen
           </button>
         )}
@@ -141,20 +143,29 @@ export function ClearanceView({ h, successorActive }: { h: Handover; successorAc
   const id = h.id
   const { data: c, error, reload } = useApi<Clearance>(`/handovers/${encodeURIComponent(id)}/clearance`)
   const [failed, setFailed] = useState('')
+  // One action at a time: a double click would send the same change twice.
+  const [busy, setBusy] = useState(false)
   if (error) return <ErrorNote message={error} />
   if (!c) return <Loading />
 
   async function set(key: string, status: Row['status']) {
+    if (busy) return
+    setBusy(true)
     setFailed('')
     try {
       await api.post(`/handovers/${encodeURIComponent(id)}/clearance`, { key, status })
       reload()
     } catch (e) {
       setFailed(e instanceof Error ? e.message : 'Failed')
+    } finally {
+      setBusy(false)
     }
   }
 
   async function hand(r: Row) {
+    if (busy) return
+    if (r.key.startsWith('admin:') && !confirm(`Give admin access to ${r.label} to ${h.successor ?? 'the successor'}?`)) return
+    setBusy(true)
     setFailed('')
     try {
       if (r.key.startsWith('admin:')) await api.post(`/handovers/${encodeURIComponent(id)}/accounts/${encodeURIComponent(r.target)}/reassign`, {})
@@ -162,20 +173,26 @@ export function ClearanceView({ h, successorActive }: { h: Handover; successorAc
       reload()
     } catch (e) {
       setFailed(e instanceof Error ? e.message : 'Failed')
+    } finally {
+      setBusy(false)
     }
   }
 
   async function decide(p: Proposal, approve: boolean) {
+    if (busy) return
+    setBusy(true)
     setFailed('')
     try {
       await api.post(`/reassignments/${encodeURIComponent(p.id)}/decide`, { approve })
       reload()
     } catch (e) {
       setFailed(e instanceof Error ? e.message : 'Failed')
+    } finally {
+      setBusy(false)
     }
   }
 
-  const actions: Actions = { set, hand, successor: h.successor, successorActive, proposed: new Set(c.proposals.map((p) => p.account)) }
+  const actions: Actions = { set, hand, busy, successor: h.successor, successorActive, proposed: new Set(c.proposals.map((p) => p.account)) }
   const groups = [...new Set(c.items.map((r) => r.group))]
   return (
     <div className="flex flex-col gap-4">
@@ -197,10 +214,10 @@ export function ClearanceView({ h, successorActive }: { h: Handover; successorAc
                 </span>
                 {c.can_confirm ? (
                   <span className="flex gap-2">
-                    <Button variant="secondary" onClick={() => void decide(p, true)}>
+                    <Button variant="secondary" onClick={() => void decide(p, true)} disabled={busy}>
                       Approve
                     </Button>
-                    <Button variant="ghost" onClick={() => void decide(p, false)}>
+                    <Button variant="ghost" onClick={() => void decide(p, false)} disabled={busy}>
                       Reject
                     </Button>
                   </span>
@@ -255,6 +272,8 @@ function LetterSection({ h, c, onChange }: { h: Handover; c: Clearance; onChange
   const [done, setDone] = useState('')
 
   async function send(when: 'now' | 'last_day') {
+    // Emailing the letter can't be taken back: say who gets it first.
+    if (when === 'now' && !confirm(`Email the relieving letter to ${h.employee} now?`)) return
     setBusy(true)
     setError('')
     try {

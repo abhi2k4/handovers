@@ -2,7 +2,7 @@ import { Database, Inbox, PlugsConnected, Upload } from '../components/icons'
 import { useRef, useState } from 'react'
 import { Link } from 'react-router'
 import { StatBand } from '../components/StatBand'
-import { Button, Card, CardHeader, Chip, Empty, PageHeader, Select } from '../components/ui'
+import { Button, Card, CardHeader, Chip, Empty, ErrorNote, PageHeader, Select } from '../components/ui'
 import { Pager } from '../components/Pager'
 import { useApi } from '../hooks/useApi'
 import { useViewAs } from '../hooks/useViewAs'
@@ -60,7 +60,7 @@ function ReviewItem({
 }) {
   const [who, setWho] = useState(r.employee)
   return (
-    <li className="grid gap-3 border-b border-line py-3 last:border-0 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+    <li className="grid grid-cols-[minmax(0,1fr)] gap-3 border-b border-line py-3 last:border-0 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
       <div className="min-w-0">
         <div className="text-[14px] font-medium">
           {r.title} <span className="font-normal text-ink-3">· {r.kind}</span>
@@ -89,6 +89,20 @@ function ReviewItem({
 }
 
 export function SourcesPage() {
+  const { has } = useViewAs()
+  // What enters the company memory is HR's to decide (the API refuses everyone else).
+  if (!has('hr')) {
+    return (
+      <>
+        <PageHeader title="Sources" />
+        <ErrorNote message="Sources are managed by HR. Ask your HR team to add a document to the company memory." />
+      </>
+    )
+  }
+  return <Sources />
+}
+
+function Sources() {
   const { data: people } = useApi<PersonRow[]>('/people')
   const uploads = useApi<UploadRow[]>('/uploads')
   const review = useApi<ReviewRow[]>('/review')
