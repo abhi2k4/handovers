@@ -1,9 +1,10 @@
-import cytoscape from 'cytoscape'
+import type cytoscape from 'cytoscape'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { graphInk, useTheme } from '../lib/theme'
 import { createPortal } from 'react-dom'
 import { Network, X } from './icons'
 import { useApi } from '../hooks/useApi'
+import { useCytoscape } from '../lib/cytoscape'
 import { Segmented } from './ui'
 
 /* "How it's built": the project's own architecture, read live from the FalkorDB graph
@@ -144,12 +145,13 @@ function Canvas({ data, selected, onSelect }: { data: ProjectGraph; selected: st
   const { theme } = useTheme()
   const box = useRef<HTMLDivElement>(null)
   const cyRef = useRef<cytoscape.Core | null>(null)
+  const cyLib = useCytoscape()
 
   useEffect(() => {
-    if (!box.current) return
+    if (!cyLib || !box.current) return
     const pos = positions(data.nodes)
     const ink = graphInk(theme)
-    const cy = cytoscape({
+    const cy = cyLib({
       container: box.current,
       elements: [
         ...data.nodes.map((n) => ({
@@ -200,7 +202,7 @@ function Canvas({ data, selected, onSelect }: { data: ProjectGraph; selected: st
     cy.on('tap', (e) => e.target === cy && onSelect(null))
     cyRef.current = cy
     return () => cy.destroy()
-  }, [data, onSelect, theme])
+  }, [cyLib, data, onSelect, theme])
 
   // Highlight the selected component and its direct links; fade the rest.
   useEffect(() => {
@@ -212,7 +214,7 @@ function Canvas({ data, selected, onSelect }: { data: ProjectGraph; selected: st
     const near = node.closedNeighborhood()
     cy.elements().not(near).addClass('faded')
     near.addClass('lit')
-  }, [selected])
+  }, [cyLib, selected])
 
   // Cytoscape sets the container to position: relative, so it is sized directly, not by inset.
   return <div ref={box} className="h-full w-full" aria-label="Architecture graph" />

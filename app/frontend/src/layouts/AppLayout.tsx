@@ -8,11 +8,12 @@ import { ThemeSwitch } from '../components/ThemeSwitch'
 import { TechGraphButton } from '../components/TechGraph'
 import { Toaster } from '../components/Toaster'
 import { Tour } from '../components/Tour'
-import { IdentityPanel, ViewAsProvider } from '../components/ViewAs'
+import { FirstVisitPicker, IdentityPanel, ViewAsProvider } from '../components/ViewAs'
 import { useTour } from '../hooks/useTour'
 import { useViewAs } from '../hooks/useViewAs'
 import { Kbd } from '../components/ui'
 import { useApi } from '../hooks/useApi'
+import { useDataVersion } from '../lib/freshness'
 import { date } from '../lib/format'
 import { GROUPS, useNav } from './nav'
 
@@ -39,11 +40,13 @@ function Shell() {
   // The platform admin is not an employee: Integrations only, no people or work pages.
   const items = useNav()
   const { data: meta } = useApi<Meta>('/meta')
+  // Counts refetch after a change or on returning to the tab, not on every page change.
+  const version = useDataVersion()
   const location = useLocation()
-  const { data: handovers } = useApi<{ status: string }[]>(`/handovers?as=${persona}&r=${location.pathname}`)
+  const { data: handovers } = useApi<{ status: string }[]>(`/handovers?as=${persona}&v=${version}`)
   // The review queue is HR's (Sources); others would only get a 403.
-  const { data: review } = useApi<unknown[]>(me?.roles.includes('hr') || !persona ? `/review?as=${persona}&r=${location.pathname}` : null)
-  const { data: alerts } = useApi<{ acted: string | null }[]>(persona && !me?.roles.includes('platform_admin') ? `/alerts?as=${persona}&r=${location.pathname}` : null)
+  const { data: review } = useApi<unknown[]>(me?.roles.includes('hr') || !persona ? `/review?as=${persona}&v=${version}` : null)
+  const { data: alerts } = useApi<{ acted: string | null }[]>(persona && !me?.roles.includes('platform_admin') ? `/alerts?as=${persona}&v=${version}` : null)
   const counts = {
     handovers: (handovers ?? []).filter((h) => h.status !== 'transferred').length,
     review: review?.length ?? 0,
@@ -178,6 +181,7 @@ function Shell() {
       <ScrollRestoration />
       {menu && <CommandMenu open onClose={() => setMenu(false)} />}
       <Tour open={tour.open} onClose={tour.hide} />
+      <FirstVisitPicker paused={tour.open} />
       <Toaster />
     </div>
   )

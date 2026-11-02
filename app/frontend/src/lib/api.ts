@@ -1,3 +1,4 @@
+import { dataChanged } from './freshness'
 import { addTrace } from './trace'
 import { getViewAs, setViewAs } from './viewAs'
 
@@ -16,6 +17,9 @@ export class ApiError extends Error {
     this.confirm = confirm
   }
 }
+
+/** POSTs that only read or check (questions, previews, tests): nothing shared changes. */
+const READS = /^\/(copilot|companion\/[^/]+\/ask|gaps\/[^/]+\/preview|handovers\/[^/]+\/resume-check|connectors\/[^/]+\/test|alerts\/delivery\/[^/]+\/test)(\?|$)/
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`/api${path}`, {
@@ -50,7 +54,10 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     }
     throw new ApiError(response.status, message, confirm)
   }
-  return (await response.json()) as T
+  const body = (await response.json()) as T
+  // A change went through: shared counts and "me" may be out of date now.
+  if (init?.method && init.method !== 'GET' && !READS.test(path)) dataChanged()
+  return body
 }
 
 export const api = {
