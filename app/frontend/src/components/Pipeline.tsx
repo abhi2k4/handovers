@@ -12,26 +12,30 @@ export interface Stage {
  */
 export function Pipeline({ stages }: { stages: Stage[] }) {
   return (
-    <ol className="grid min-w-[480px] flex-1 grid-flow-col gap-1 overflow-x-auto" style={{ gridAutoColumns: 'minmax(0,1fr)' }} aria-label="Exit stage">
-      {stages.map((s, i) => (
-        <li key={s.key} aria-current={s.state === 'current' ? 'step' : undefined} className="flex min-w-0 flex-col gap-1.5">
-          <span
-            aria-hidden
-            className={`h-[3px] rounded-[1px] ${s.state === 'done' ? 'bg-ok' : s.state === 'current' ? 'bg-accent-fill' : 'bg-line'}`}
-          />
-          <span className="flex items-center gap-1.5 whitespace-nowrap">
+    // Five stages need ~480px: the track takes its own line when there is less room beside it, and
+    // on a phone it scrolls inside itself, not the whole page.
+    <div className="min-w-0 flex-[1_1_480px] overflow-x-auto">
+      <ol className="grid min-w-[480px] grid-flow-col gap-1" style={{ gridAutoColumns: 'minmax(0,1fr)' }} aria-label="Exit stage">
+        {stages.map((s, i) => (
+          <li key={s.key} aria-current={s.state === 'current' ? 'step' : undefined} className="flex min-w-0 flex-col gap-1.5">
             <span
-              className={`flex size-4 items-center justify-center rounded-[2px] font-mono text-[10px] ${
-                s.state === 'done' ? 'bg-ok text-white' : s.state === 'current' ? 'bg-accent-fill text-white' : 'text-ink-3 shadow-[inset_0_0_0_1px_var(--color-control)]'
-              }`}
-            >
-              {s.state === 'done' ? <Check size={10} weight="bold" /> : i + 1}
+              aria-hidden
+              className={`h-[3px] rounded-[1px] ${s.state === 'done' ? 'bg-ok' : s.state === 'current' ? 'bg-accent-fill' : 'bg-line'}`}
+            />
+            <span className="flex items-center gap-1.5 whitespace-nowrap">
+              <span
+                className={`flex size-4 items-center justify-center rounded-[2px] font-mono text-[10px] ${
+                  s.state === 'done' ? 'bg-ok text-white' : s.state === 'current' ? 'bg-accent-fill text-white' : 'text-ink-3 shadow-[inset_0_0_0_1px_var(--color-control)]'
+                }`}
+              >
+                {s.state === 'done' ? <Check size={10} weight="bold" /> : i + 1}
+              </span>
+              <span className={`truncate text-[12.5px] ${s.state === 'current' ? 'font-semibold text-ink' : s.state === 'done' ? 'text-ink-2' : 'text-ink-3'}`}>{s.label}</span>
             </span>
-            <span className={`truncate text-[12.5px] ${s.state === 'current' ? 'font-semibold text-ink' : s.state === 'done' ? 'text-ink-2' : 'text-ink-3'}`}>{s.label}</span>
-          </span>
-        </li>
-      ))}
-    </ol>
+          </li>
+        ))}
+      </ol>
+    </div>
   )
 }
 

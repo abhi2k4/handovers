@@ -1,5 +1,6 @@
+import { dataChanged } from './freshness'
 import { addTrace } from './trace'
-import { getViewAs } from './viewAs'
+import { getViewAs, setViewAs } from './viewAs'
 
 // Single place for HTTP calls. Every request is same-origin `/api/*`:
 // Vite proxies it to FastAPI in dev; nginx does the same in Docker.
@@ -16,6 +17,9 @@ export class ApiError extends Error {
     this.confirm = confirm
   }
 }
+
+/** POSTs that only read or check (questions, previews, tests): nothing shared changes. */
+const READS = /^\/(copilot|companion\/[^/]+\/ask|gaps\/[^/]+\/preview|handovers\/[^/]+\/resume-check|connectors\/[^/]+\/test|alerts\/delivery\/[^/]+\/test)(\?|$)/
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`/api${path}`, {
@@ -42,9 +46,18 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     } catch {
       // keep the generic message
     }
+    if (response.status === 401 && message.startsWith('Unknown person for View as') && getViewAs()) {
+      // The remembered View-as person no longer exists (sample data reloaded): forget them and
+      // start again, or every page would be refused.
+      setViewAs('')
+      window.location.reload()
+    }
     throw new ApiError(response.status, message, confirm)
   }
-  return (await response.json()) as T
+  const body = (await response.json()) as T
+  // A change went through: shared counts and "me" may be out of date now.
+  if (init?.method && init.method !== 'GET' && !READS.test(path)) dataChanged()
+  return body
 }
 
 export const api = {

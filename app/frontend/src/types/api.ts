@@ -244,6 +244,10 @@ export interface Citation {
   previous: string | null
   valid_from: number | null
   evidence: { id: string; kind: string; title: string; at: number; author?: string; quote?: string }[]
+  /** 0..1, from every source behind it; null for items that are not knowledge. */
+  confidence?: number | null
+  /** How many independent sources back it. */
+  sources?: number | null
 }
 
 export interface Answer {

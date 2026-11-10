@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router'
 import { useViewAs } from '../hooks/useViewAs'
-import { Loading } from '../components/ui'
+import { ErrorNote, Loading } from '../components/ui'
 import { EmployeeHome } from './home/EmployeeHome'
 import { LeadershipHome } from './home/LeadershipHome'
 import { LeaverHome } from './home/LeaverHome'
@@ -11,9 +11,9 @@ import { PersonPage } from './PersonPage'
 
 /** One app, a different home per person (docs/product-strategy.md section 10.2). */
 export function HomePage() {
-  const { persona, me } = useViewAs()
+  const { persona, me, meError } = useViewAs()
   if (!persona) return <OverviewPage />
-  if (!me) return <Loading />
+  if (!me) return meError ? <ErrorNote message={meError} /> : <Loading />
   switch (me.home) {
     case 'leaver':
       return <LeaverHome me={me} />
@@ -35,8 +35,8 @@ export function HomePage() {
 
 /** "My memory": your own person page, written to you. Without a persona there is no "you". */
 export function MyMemoryPage() {
-  const { persona, me } = useViewAs()
+  const { persona, me, meError } = useViewAs()
   if (!persona) return <Navigate to="/people" replace />
-  if (!me) return <Loading />
+  if (!me) return meError ? <ErrorNote message={meError} /> : <Loading />
   return <PersonPage self={me.id} />
 }

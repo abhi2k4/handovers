@@ -46,6 +46,8 @@ jobs:
         run: uv run mypy
       - name: Tests (unit + integration against FalkorDB)
         run: uv run pytest
+      - name: Benchmark (no regression vs the latest committed run, no leaks)
+        run: uv run python -m bench.run --check
       - name: pip requirement files match uv.lock
         run: |
           uv export --frozen --format requirements-txt --no-dev --no-hashes --no-annotate -o requirements.txt >/dev/null

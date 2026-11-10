@@ -52,6 +52,9 @@ APPROVE = (
 )
 
 
+RESUME_MAX_BYTES = 5 * 1024 * 1024
+
+
 class OpenIn(BaseModel):
     employee_id: str
     successor_id: str | None = None
@@ -190,7 +193,12 @@ async def resume_check(
 ) -> dict[str, Any]:
     forbid(access.can_run_handover(caller, await _leaver(graph, hid)), RUN)
     if file is not None:
-        text = to_markdown(file.filename or "resume.pdf", await file.read())
+        if file.size is not None and file.size > RESUME_MAX_BYTES:
+            raise HTTPException(413, "Resumes up to 5 MB.")
+        try:
+            text = to_markdown(file.filename or "resume.pdf", await file.read())
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from exc
     if not text.strip():
         raise HTTPException(422, "Paste the resume text or attach a file.")
     try:
@@ -275,7 +283,7 @@ async def confirm(gid: str, body: ConfirmIn, graph: GraphDep, caller: CallerDep)
     forbid(access.can_answer(caller, await _gap_leaver(graph, gid)), ANSWER)
     try:
         return await svc.confirm_answer(graph, gid, body.answer, body.facts, body.keep)
-    except svc.NotFound as exc:
+    except (svc.NotFound, svc.Conflict) as exc:
         raise _http(exc) from exc
 
 

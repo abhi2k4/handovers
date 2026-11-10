@@ -86,6 +86,8 @@ async def reassign_account(
     )
     if h["status"] == "cancelled":
         raise HTTPException(409, "This handover was cancelled.")
+    if await graph.one("leaver_holds_account", {"handover": hid, "account": aid}) is None:
+        raise HTTPException(404, "This person has no access to that account.")
     to = body.to or h.get("successor_id")
     if not to:
         raise HTTPException(409, "Choose a successor first, or say who takes the account.")

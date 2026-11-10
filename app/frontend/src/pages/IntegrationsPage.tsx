@@ -9,6 +9,7 @@ import { SignInSettings } from '../components/SignInSettings'
 import { Button, Chip, ErrorNote, Input, Modal, PageHeader, PageSkeleton, Segmented } from '../components/ui'
 import { useApi } from '../hooks/useApi'
 import { READ_ONLY_HINT, useSetupReadOnly } from '../hooks/useViewAs'
+import { notifyError } from '../lib/notify'
 import { api } from '../lib/api'
 import { date } from '../lib/format'
 
@@ -182,8 +183,13 @@ function SampleCompany() {
   async function reset() {
     if (!confirm('Reload the Northwind sample data? Handovers and uploads are cleared.')) return
     setBusy(true)
-    await api.post('/demo/reset')
-    window.location.assign(APP_BASE)
+    try {
+      await api.post('/demo/reset')
+      window.location.assign(APP_BASE)
+    } catch (e) {
+      notifyError(e)
+      setBusy(false)
+    }
   }
 
   return (
@@ -468,6 +474,7 @@ function ConnectModal({ c, account, onClose, onSaved }: { c: Connector; account:
   const [busy, setBusy] = useState<'save' | 'remove' | 'test' | null>(null)
   const [test, setTest] = useState<{ ok: boolean; message: string } | null>(null)
   const [failure, setFailure] = useState<string | null>(null)
+  const [created, setCreated] = useState<string | null>(null)
   const fromApp = fields.some((f) => f.source === 'app')
   // A second account of a tool needs a name to tell it apart; the first may stay unnamed.
   const needsLabel = tool && !account
@@ -480,11 +487,13 @@ function ConnectModal({ c, account, onClose, onSaved }: { c: Connector; account:
     setBusy('save')
     setFailure(null)
     try {
-      let saved = id
-      if (!account) {
+      // Once the account exists (e.g. created, then the sync failed), save to it: never create twice.
+      let saved = created ?? id
+      if (!account && !created) {
         saved = (await api.post<{ id: string }>(`/connectors/${encodeURIComponent(c.id)}/accounts`, { values, label, teams })).id
+        setCreated(saved)
       } else {
-        await api.put(`/connectors/${encodeURIComponent(id)}/config`, tool ? { values, label: label.trim() || null, teams } : { values })
+        await api.put(`/connectors/${encodeURIComponent(saved)}/config`, tool ? { values, label: label.trim() || null, teams } : { values })
       }
       if (syncAfter) await api.post(`/connectors/${encodeURIComponent(saved)}/sync`)
       onSaved()

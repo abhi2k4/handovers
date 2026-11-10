@@ -58,6 +58,8 @@ interface ViewAsState {
   setPersona: (id: string) => void
   /** null when no persona is chosen (unrestricted demo mode). */
   me: Me | null
+  /** Why `me` could not be loaded (shown instead of waiting forever). */
+  meError: string | null
   has: (role: string) => boolean
   session: Session | null
   auth: AuthConfig | null
@@ -69,6 +71,7 @@ export const ViewAsContext = createContext<ViewAsState>({
   persona: '',
   setPersona: () => {},
   me: null,
+  meError: null,
   has: () => true,
   session: null,
   auth: null,

@@ -160,6 +160,7 @@ export function AlertsPage() {
   const [error, setError] = useState('')
 
   if (!persona) return <ErrorNote message="Choose who you are in View as to see your alerts." />
+  if (settings.error || inbox.error) return <ErrorNote message={settings.error ?? inbox.error ?? 'Could not load alerts.'} />
   if (!settings.data || !inbox.data) return <PageSkeleton />
 
   async function act(a: Alert, button: string) {
@@ -199,7 +200,7 @@ export function AlertsPage() {
         </div>
       </header>
       {error && <ErrorNote message={error} />}
-      <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <Card>
           <CardHeader title="Messages" meta={inbox.data.length || undefined} />
           {inbox.data.length === 0 ? (

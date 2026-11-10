@@ -11,4 +11,4 @@ WHERE kb.revoked_at IS NULL AND b.subject = a.subject AND b.predicate = a.predic
 OPTIONAL MATCH (b)-[:EVIDENCED_BY]->(src:Source)
 WITH a, b, collect(DISTINCT {id: src.id, kind: src.kind, title: src.title, at: src.occurred_at}) AS evidence
 RETURN a.id AS claim, b.id AS id, b.kind AS kind, b.title AS title, b.value AS value,
-       b.valid_from AS valid_from, evidence
+       b.valid_from AS valid_from, b.confidence AS confidence, b.sources AS sources, evidence

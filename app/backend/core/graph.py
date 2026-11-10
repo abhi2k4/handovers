@@ -81,6 +81,17 @@ def _plain(value: Any) -> Any:
     return value
 
 
+def _clean(value: Any) -> Any:
+    """Drop NUL characters from string parameters: FalkorDB cannot parse them (a 500 otherwise)."""
+    if isinstance(value, str):
+        return value.replace("\x00", "")
+    if isinstance(value, list):
+        return [_clean(v) for v in value]
+    if isinstance(value, dict):
+        return {k: _clean(v) for k, v in value.items()}
+    return value
+
+
 class Graph:
     """Runs catalogued queries against the tenant graph (or another named graph) as dicts."""
 
@@ -98,7 +109,7 @@ class Graph:
         """Read-write query."""
         started = time.perf_counter()
         result = await self._client.graph(self._graph_name).query(
-            self.catalog.get(name, label), params or {}
+            self.catalog.get(name, label), _clean(params or {})
         )
         rows = _rows(result)
         trace.record(
@@ -113,7 +124,7 @@ class Graph:
         started = time.perf_counter()
         try:
             result = await self._client.graph(self._graph_name).ro_query(
-                self.catalog.get(name, label), params or {}
+                self.catalog.get(name, label), _clean(params or {})
             )
         except ResponseError as exc:
             # The tenant graph does not exist yet (nothing seeded or ingested): an empty company,

@@ -15,6 +15,11 @@ def now_ms() -> int:
     return pinned if pinned is not None else int(time.time() * 1000)
 
 
+def wall_ms() -> int:
+    """Real time, never pinned: for session expiry, which must not freeze under DEMO_NOW."""
+    return int(time.time() * 1000)
+
+
 def to_ms(value: str | datetime) -> int:
     dt = datetime.fromisoformat(value) if isinstance(value, str) else value
     if dt.tzinfo is None:

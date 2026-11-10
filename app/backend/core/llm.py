@@ -68,7 +68,10 @@ class LLM:
                 text = await self._groq(system, prompt + _schema_hint(schema))
             else:
                 text = await self._anthropic(system, prompt + _schema_hint(schema))
-            return json.loads(_strip_fences(text))
+            out = json.loads(_strip_fences(text))
+            if schema.get("type", "object") == "object" and not isinstance(out, dict):
+                raise ValueError(f"expected a JSON object, got {type(out).__name__}")
+            return out
         except LLMUnavailable:
             raise
         except Exception as exc:

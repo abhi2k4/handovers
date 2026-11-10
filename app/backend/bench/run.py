@@ -14,12 +14,17 @@ Metrics:
   leaks        private questions that returned the private item (must be 0)
 
 Run:  uv run python -m bench.run          (writes graph/benchmark/results/<date>.json)
+      uv run python -m bench.run --check  (CI: compares with the latest committed run, writes
+                                           nothing, exits 1 on a regression or any leak)
 """
 
+import argparse
 import asyncio
 import json
+import sys
 import time
 from datetime import UTC, datetime
+from pathlib import Path
 from typing import Any
 
 from core.config import Settings, get_settings
@@ -105,7 +110,38 @@ async def flat_setup(graph: Graph, questions: list[dict[str, Any]]) -> list[dict
     return out
 
 
-async def main() -> None:
+def latest_committed(results_dir: Path) -> dict[str, Any] | None:
+    """The newest committed run (file names start with the date, so the last name is newest)."""
+    runs = sorted(results_dir.glob("*.json"))
+    if not runs:
+        return None
+    data: dict[str, Any] = json.loads(runs[-1].read_text(encoding="utf-8"))
+    return data
+
+
+def regressions(now: dict[str, Any], baseline: dict[str, Any]) -> list[str]:
+    """What got worse than the committed run. Empty: no regression.
+
+    The handover setup must answer at least as well, and leak nothing; the successor must still
+    know nothing before the handover (otherwise private memory is reachable early).
+    """
+    out = []
+    got, was = now["setups"]["handovers"], baseline["setups"]["handovers"]
+    for metric in ("answered_at_4", "top1"):
+        if got[metric] < was[metric]:
+            out.append(f"handovers {metric}: {got[metric]:.3f} < committed {was[metric]:.3f}")
+    if got["leaks"] > 0:
+        out.append(f"handovers leaks: {got['leaks']} (must be 0)")
+    before, before_was = now["setups"]["before"], baseline["setups"]["before"]
+    if before["answered_at_4"] > before_was["answered_at_4"]:
+        out.append(
+            f"before answered_at_4: {before['answered_at_4']:.3f} > committed "
+            f"{before_was['answered_at_4']:.3f} (the successor knows things before the handover)"
+        )
+    return out
+
+
+async def main(check: bool = False) -> int:
     base = get_settings().graph_dir
     questions = json.loads(
         (base / "seed" / "northwind" / "benchmark.json").read_text(encoding="utf-8")
@@ -153,17 +189,33 @@ async def main() -> None:
         "seconds": round(time.perf_counter() - started, 2),
     }
     out = base / "benchmark" / "results"
-    out.mkdir(parents=True, exist_ok=True)
-    path = out / f"{datetime.now(UTC):%Y-%m-%d}-falkordb-{engine}.json"
-    path.write_text(json.dumps(results, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-
     print(f"{'setup':<12}{'answered@4':>12}{'top1':>8}{'leaks':>8}")
     for name, s in setups.items():
         print(f"{name:<12}{s['answered_at_4']:>12.0%}{s['top1']:>8.0%}{s['leaks']:>8}")
+
+    if check:
+        baseline = latest_committed(out)
+        if baseline is None:
+            print("No committed run to compare with.")
+            return 1
+        failed = regressions(results, baseline)
+        for line in failed:
+            print(f"REGRESSION {line}")
+        print("Benchmark check: " + ("FAILED" if failed else f"ok (vs {baseline['run_at'][:10]})"))
+        return 1 if failed else 0
+
+    out.mkdir(parents=True, exist_ok=True)
+    path = out / f"{datetime.now(UTC):%Y-%m-%d}-falkordb-{engine}.json"
+    path.write_text(json.dumps(results, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(
         f"FalkorDB {engine} | {len(questions)} questions ({setups['handovers']['private']} private) | {results['seconds']}s | {path}"
     )
+    return 0
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument(
+        "--check", action="store_true", help="compare with the latest committed run; write nothing"
+    )
+    sys.exit(asyncio.run(main(parser.parse_args().check)))

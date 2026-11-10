@@ -265,12 +265,12 @@ export function OverviewPage() {
 
       <Summary d={d} />
 
-      <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-4 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
         <Handovers handovers={d.handovers} onStart={() => setStarting(true)} />
         <NeedsAttention items={d.attention} />
       </div>
 
-      <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-4 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
         <SoleHolders people={d.risk.people} onPick={setPicked} />
         <div className="flex flex-col gap-4">
           <Card>

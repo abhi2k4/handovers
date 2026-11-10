@@ -179,7 +179,7 @@ def is_overview(question: str) -> bool:
 def is_follow_up(question: str) -> bool:
     """A short question that leans on the previous one ("and why?", "how?")."""
     words = re.findall(r"[a-z']+", question.lower())
-    return len(words) <= 4 and (not tokens(question) or words[0] in FOLLOW_UP)
+    return len(words) <= 4 and (not tokens(question) or bool(words and words[0] in FOLLOW_UP))
 
 
 def digest(person: dict[str, Any]) -> list[dict[str, Any]]:
@@ -426,6 +426,10 @@ def _citation(c: dict[str, Any]) -> dict[str, Any]:
         "previous": c.get("previous_value"),
         "valid_from": c.get("valid_from"),
         "evidence": (c.get("evidence") or [])[:4],
+        # How much to trust it: noisy-OR over its sources (knowledge_confidence.cypher), and how
+        # many independent sources back it. None for items that are not knowledge.
+        "confidence": c.get("confidence"),
+        "sources": c.get("sources"),
     }
 
 
@@ -440,8 +444,8 @@ ANSWER_SCHEMA = {
 }
 
 
-async def _history(graph: Graph, session: str) -> list[dict[str, Any]]:
-    rows = await graph.read("session_turns", {"session": session, "limit": 4})
+async def _history(graph: Graph, session: str, emp: str) -> list[dict[str, Any]]:
+    rows = await graph.read("session_turns", {"session": session, "emp": emp, "limit": 4})
     return list(reversed(rows))
 
 
@@ -483,7 +487,7 @@ async def ask(
 
     now = now_ms()
     session = session or f"ses:{emp}"
-    history = await _history(graph, session)
+    history = await _history(graph, session, emp)
     # A short follow-up ("and why?") searches with the question it follows.
     search = question
     if history and is_follow_up(question):
@@ -519,7 +523,7 @@ async def ask(
                     "method": "graph",
                 }
             return None
-        valid = [c for c in out.get("citations", []) if c in ids_all]
+        valid = [c for c in out.get("citations") or [] if isinstance(c, str) and c in ids_all]
         if not out.get("answered") or not valid:
             # Keep the model's one line on what is missing; it is more useful than a generic reply.
             missing.append(clean(out.get("answer") or ""))
@@ -644,7 +648,7 @@ async def ask(
                 ),
                 ANSWER_SCHEMA,
             )
-            valid = [c for c in out.get("citations", []) if c in ids]
+            valid = [c for c in out.get("citations") or [] if isinstance(c, str) and c in ids]
             if out.get("answered") and valid:
                 answer, cited, method = clean(out["answer"]), valid, llm.model
             elif not out.get("answered"):

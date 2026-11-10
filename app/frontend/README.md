@@ -16,7 +16,13 @@ One site, one build:
 | anything else | An older app link (`/handovers/…`, `/login` from Keycloak's logout): forwarded to `/dashboard/…` |
 
 `src/main.tsx` picks the side; each is lazy-loaded, so app visitors never download the landing
-page's animation code. Inside the app, links stay app-relative (`/handovers/x`); the router adds
+page's animation code.
+
+Inside the app, pages most people open rarely (Integrations, Policies, Accounts, Sources, Insights,
+Login) load on demand and are fetched in idle time after the first screen (`app/router.tsx`).
+Cytoscape loads only when a graph is shown (`lib/cytoscape.ts`). Sidebar counts and `/me` refetch
+after a change made through the API or on returning to the tab, not on every page change
+(`lib/freshness.ts`). Inside the app, links stay app-relative (`/handovers/x`); the router adds
 `/dashboard`. The backend builds absolute app links with `Settings.app_url()`.
 
 Landing assets live in `src/landing/art/`: two photographs from Unsplash (Unsplash licence) and one

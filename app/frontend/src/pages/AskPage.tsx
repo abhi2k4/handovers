@@ -42,7 +42,8 @@ function Trail({ c, you, onSources }: { c: Citation; you: string; onSources: () 
           <button onClick={onSources} className="rounded-[2px] hover:opacity-80">
             <Stop tone="source">
               {kinds.slice(0, 2).join(', ')}
-              {c.evidence.length > 1 ? ` (${c.evidence.length})` : ''}
+              {/* All sources behind it, not only the few quotes listed when opened. */}
+              {(c.sources ?? c.evidence.length) > 1 ? ` (${c.sources ?? c.evidence.length})` : ''}
             </Stop>
           </button>
           {link}
@@ -68,6 +69,22 @@ function Trail({ c, you, onSources }: { c: Citation; you: string; onSources: () 
   )
 }
 
+/**
+ * How much to trust a cited item, in words and colour: the confidence the graph computed from its
+ * sources (0.75 is where the pipeline accepts a fact on its own; below 0.5 it was never confirmed).
+ */
+function Trust({ c }: { c: Citation }) {
+  if (c.confidence == null) return null
+  const [word, tone] = c.confidence >= 0.75 ? ['High', 'text-ok-text'] : c.confidence >= 0.5 ? ['Medium', 'text-soon'] : ['Low', 'text-risk-text']
+  const n = c.sources ?? 0
+  return (
+    <div className="text-[12.5px] text-ink-3" title={`Confidence ${Math.round(c.confidence * 100)}%`}>
+      <span className={`font-medium ${tone}`}>{word} confidence</span>
+      {n > 0 && ` · ${n} ${n === 1 ? 'source' : 'sources'}`}
+    </div>
+  )
+}
+
 function Provenance({ c, you }: { c: Citation; you: string }) {
   const [open, setOpen] = useState(false)
   return (
@@ -76,6 +93,7 @@ function Provenance({ c, you }: { c: Citation; you: string }) {
         <span className="eyebrow w-[92px] shrink-0 pt-0.5">{c.kind}</span>
         <div className="min-w-0 flex-1">
           <div className="text-[14px] leading-5 text-ink">{c.title}</div>
+          <Trust c={c} />
           {(c.valid_from || c.previous) && (
             <div className="text-ink-3">
               {c.valid_from ? `True since ${date(c.valid_from, true)}` : ''}
@@ -143,7 +161,7 @@ function AnswerText({ text, muted }: { text: string; muted: boolean }) {
 }
 
 /** Whose memory this is and what it holds: the only place answers can come from. */
-function MemoryPanel({ p, onAsk }: { p: Profile; onAsk: (q: string) => void }) {
+function MemoryPanel({ p, onAsk, busy }: { p: Profile; onAsk: (q: string) => void; busy: boolean }) {
   const figures: [string, number][] = [
     ['Knowledge', p.counts.knowledge],
     ['Work', p.counts.work],
@@ -194,7 +212,8 @@ function MemoryPanel({ p, onAsk }: { p: Profile; onAsk: (q: string) => void }) {
               <li key={q}>
                 <button
                   onClick={() => onAsk(q)}
-                  className="w-full rounded-[4px] px-2.5 py-1.5 text-left text-[13px] text-ink-2 shadow-[inset_0_0_0_1px_var(--color-line)] transition-colors hover:bg-app hover:text-ink"
+                  disabled={busy}
+                  className="w-full rounded-[4px] px-2.5 py-1.5 text-left text-[13px] text-ink-2 shadow-[inset_0_0_0_1px_var(--color-line)] transition-colors hover:bg-app hover:text-ink disabled:cursor-wait disabled:opacity-60"
                 >
                   {q}
                 </button>
@@ -257,7 +276,8 @@ function Ask({ fallback }: { fallback: string }) {
   }, [turns])
 
   async function ask(q: string) {
-    if (!q.trim() || !as) return
+    // One question at a time: answers land on the last turn, so a second one would take its place.
+    if (!q.trim() || !as || busy) return
     setQuestion('')
     setBusy(true)
     setTurns((t) => [...t, { question: q }])
@@ -355,7 +375,7 @@ function Ask({ fallback }: { fallback: string }) {
           </>
         )}
       </div>
-      {as && profile && <MemoryPanel p={profile} onAsk={(q) => void ask(q)} />}
+      {as && profile && <MemoryPanel p={profile} busy={busy} onAsk={(q) => void ask(q)} />}
     </div>
   )
 }

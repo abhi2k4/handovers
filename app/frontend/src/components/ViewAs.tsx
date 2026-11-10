@@ -5,9 +5,10 @@ import { Link, useNavigate } from 'react-router'
 import { useApi } from '../hooks/useApi'
 import { ViewAsContext, useViewAs, type AuthConfig, type Me, type Persona, type Session } from '../hooks/useViewAs'
 import { api } from '../lib/api'
+import { useDataVersion } from '../lib/freshness'
 import { getViewAs, setViewAs } from '../lib/viewAs'
 import { Check, ChevronsUpDown, SignOut, Users } from './icons'
-import { Avatar } from './ui'
+import { Avatar, Button, Modal } from './ui'
 
 /**
  * Who is using the app. A signed-in session (Keycloak) wins: the persona is then that person and the
@@ -18,8 +19,10 @@ export function ViewAsProvider({ children }: { children: ReactNode }) {
   const { data: session, loading: sessionLoading } = useApi<Session | null>('/auth/session')
   const [chosen, setState] = useState(getViewAs())
   const persona = session?.employee ?? chosen
-  // The query string only re-keys the request when the persona changes; the header carries it.
-  const { data } = useApi<Me | null>(`/me?as=${encodeURIComponent(persona)}`)
+  const version = useDataVersion()
+  // The query string re-keys the request when the persona changes or data changed (the header
+  // carries the persona), so homes built from `me` (leaving, managing) are fresh after an action.
+  const { data, error: meError } = useApi<Me | null>(`/me?as=${encodeURIComponent(persona)}&v=${version}`)
   const me = persona && data?.id === persona ? data : null
 
   useEffect(() => {
@@ -35,7 +38,7 @@ export function ViewAsProvider({ children }: { children: ReactNode }) {
   const has = (role: string) => !persona || (me?.roles.includes(role) ?? false)
 
   return (
-    <ViewAsContext.Provider value={{ persona, setPersona, me, has, session: session ?? null, auth: auth ?? null, sessionLoading }}>
+    <ViewAsContext.Provider value={{ persona, setPersona, me, meError: me ? null : meError, has, session: session ?? null, auth: auth ?? null, sessionLoading }}>
       {children}
     </ViewAsContext.Provider>
   )
@@ -53,9 +56,14 @@ function SignedIn() {
 
   async function signOut() {
     setBusy(true)
-    const { logout_url } = await api.post<{ logout_url: string | null }>('/auth/logout')
+    let logoutUrl: string | null = null
+    try {
+      logoutUrl = (await api.post<{ logout_url: string | null }>('/auth/logout')).logout_url
+    } catch {
+      // The session may already be gone; go to the sign-in page either way.
+    }
     // Keycloak ends its own session too, then returns to /login.
-    window.location.assign(logout_url ?? `${APP_BASE}/login`)
+    window.location.assign(logoutUrl ?? `${APP_BASE}/login`)
   }
 
   return (
@@ -106,8 +114,10 @@ function ViewAsSwitcher({ signIn = false }: { signIn?: boolean }) {
     navigate('/')
   }
 
+  // With sign-in on, no person means look-only (the API refuses changes).
+  const lookOnly = useViewAs().auth?.sso ?? false
   const options: { id: string; name: string; sub: string }[] = [
-    { id: '', name: 'Everyone', sub: 'No restrictions' },
+    { id: '', name: 'Everyone', sub: lookOnly ? 'Look only' : 'No restrictions' },
     ...(personas ?? []).map((p) => ({ id: p.id, name: p.name, sub: p.label })),
   ]
 
@@ -157,10 +167,87 @@ function ViewAsSwitcher({ signIn = false }: { signIn?: boolean }) {
         {me ? <Avatar name={me.name} size={32} /> : <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-hover text-ink-3"><Users size={16} /></span>}
         <span className="min-w-0 flex-1 leading-tight">
           <span className="block truncate text-[14px] font-medium text-ink">{me?.name ?? current?.name ?? 'Everyone'}</span>
-          <span className="block truncate text-[12px] text-ink-3">{current ? `${current.label} · guest view` : 'Guest · no restrictions'}</span>
+          <span className="block truncate text-[12px] text-ink-3">{current ? `${current.label} · guest view` : lookOnly ? 'Guest · look only' : 'Guest · no restrictions'}</span>
         </span>
         <ChevronsUpDown size={15} className="shrink-0 text-ink-3" />
       </button>
     </div>
+  )
+}
+
+const LOOK_ONLY = 'handovers.lookOnly'
+
+function lookingOnly(): boolean {
+  try {
+    return sessionStorage.getItem(LOOK_ONLY) === '1'
+  } catch {
+    return false
+  }
+}
+
+/**
+ * First visit to a deployment with sign-in on and guests allowed: pick who to explore as. Without
+ * a person (or a sign-in) the app is look-only, so the first click on any action would fail.
+ */
+export function FirstVisitPicker({ paused }: { paused: boolean }) {
+  const { persona, setPersona, session, auth, sessionLoading } = useViewAs()
+  const [dismissed, setDismissed] = useState(lookingOnly)
+  const needed = !!auth?.sso && auth.guest && !sessionLoading && !session && !persona && !dismissed
+  const { data: personas } = useApi<Persona[]>(needed ? '/personas' : null)
+  const navigate = useNavigate()
+  if (!needed || paused) return null
+
+  function lookAround() {
+    try {
+      sessionStorage.setItem(LOOK_ONLY, '1')
+    } catch {
+      // storage unavailable: the choice lasts for this page only
+    }
+    setDismissed(true)
+  }
+
+  return (
+    <Modal
+      title="Explore Handovers as…"
+      description="Each person sees what they would at work: their own home, alerts and actions."
+      onClose={lookAround}
+      footer={
+        <>
+          {auth?.available && (
+            <Link to="/login" className="mr-auto text-[14px] font-medium text-accent hover:underline">
+              Sign in instead
+            </Link>
+          )}
+          <Button variant="ghost" onClick={lookAround}>
+            Just look around
+          </Button>
+        </>
+      }
+    >
+      {!personas ? (
+        <p className="text-[14px] text-ink-3">Loading people…</p>
+      ) : (
+        <ul className="flex flex-col gap-1">
+          {personas.map((p) => (
+            <li key={p.id}>
+              <button
+                onClick={() => {
+                  setPersona(p.id)
+                  navigate('/')
+                }}
+                className="flex w-full items-center gap-3 rounded-[6px] px-2.5 py-2 text-left transition-colors hover:bg-hover focus-visible:bg-hover"
+              >
+                <Avatar name={p.name} size={32} />
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[14px] font-medium text-ink">{p.name}</span>
+                  <span className="block truncate text-[12.5px] text-ink-3">{p.title}</span>
+                </span>
+                <span className="shrink-0 text-[12.5px] font-medium text-ink-2">{p.label}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </Modal>
   )
 }

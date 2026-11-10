@@ -36,7 +36,7 @@ export function AlertDelivery() {
   return (
     <section className="flex flex-col gap-4">
       <p className="text-[14px] text-ink-3">How alerts leave the app. Every alert also shows in the app. People choose their own number, email and alert types on their Alerts page.</p>
-      <div className="grid gap-3 xl:grid-cols-2">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-3 xl:grid-cols-2">
         <ChannelCard
           channel="whatsapp"
           name="WhatsApp"

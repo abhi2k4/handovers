@@ -12,6 +12,7 @@ Built entirely from the graph: what goes in the plan and how each item is worded
 import uuid
 from typing import Any
 
+from core import locks
 from core.clock import now_ms
 from core.graph import Graph
 from services import access, analysis
@@ -141,6 +142,11 @@ class NoSuccessor(Exception):
 
 async def generate(graph: Graph, hid: str) -> dict[str, Any]:
     """Create the draft plan once; later calls return the existing plan."""
+    async with locks.hold(f"ramp:{hid}"):
+        return await _generate(graph, hid)
+
+
+async def _generate(graph: Graph, hid: str) -> dict[str, Any]:
     existing = await get(graph, hid)
     if existing is not None:
         return existing

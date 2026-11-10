@@ -1,9 +1,10 @@
-import cytoscape from 'cytoscape'
+import type cytoscape from 'cytoscape'
 import { ArrowLeft, ChevronRight, Copy, ScanSearch, X } from './icons'
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { createPortal } from 'react-dom'
 import { Link, useLocation } from 'react-router'
 import { useApi } from '../hooks/useApi'
+import { useCytoscape } from '../lib/cytoscape'
 import { useViewAs } from '../hooks/useViewAs'
 import { currentTraces, startPage, subscribe } from '../lib/trace'
 import { graphInk, useTheme } from '../lib/theme'
@@ -334,15 +335,16 @@ function GraphView({ id: start }: { id: string }) {
   const box = useRef<HTMLDivElement>(null)
   const { persona } = useViewAs()
   const { theme } = useTheme()
+  const cyLib = useCytoscape()
 
   useEffect(() => {
-    if (!g || !box.current) return
+    if (!cyLib || !g || !box.current) return
     const visible = g.nodes.filter((n) => n.id === g.root || !hidden.has(groupOf(n.kind).key))
     const ids = new Set(visible.map((n) => n.id))
     const pos = layout(visible, g.root)
     const ink = graphInk(theme)
     const relationTo = new Map(g.edges.map((e) => [e.source === g.root ? e.target : e.source, e]))
-    const cy = cytoscape({
+    const cy = cyLib({
       container: box.current,
       elements: [
         ...visible.map((n) => ({
@@ -433,7 +435,7 @@ function GraphView({ id: start }: { id: string }) {
       }
     })
     return () => cy.destroy()
-  }, [g, hidden, persona, theme])
+  }, [cyLib, g, hidden, persona, theme])
 
   if (loading && !g) return <p className="text-ink-3">Loading graph…</p>
   if (error) return <p className="text-ink-3">{error}</p>

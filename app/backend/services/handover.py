@@ -14,6 +14,7 @@ import uuid
 from datetime import UTC, datetime
 from typing import Any
 
+from core import locks
 from core.clock import iso, now_ms
 from core.graph import Graph
 from core.llm import LLM, LLMUnavailable
@@ -122,6 +123,8 @@ async def open_handover(
         },
     )
     if not rows:
+        if await graph.read("handover_open_for_employee", {"emp": emp}):
+            raise Conflict("This person already has an open handover.")
         raise NotFound(emp)
     if successor:
         await graph.run("handover_set_successor", {"id": hid, "successor": successor})
@@ -448,6 +451,22 @@ async def claim_choices(graph: Graph, gap: dict[str, Any]) -> list[dict[str, Any
     return out
 
 
+def with_edits(facts: list[Fact], edits: list[dict[str, Any]]) -> list[Fact]:
+    """Apply the leaver's edits from the review step: wording only, position by position."""
+    for f, edit in zip(facts, edits, strict=False):
+        if not isinstance(edit, dict):
+            continue
+        for field in ("title", "rationale"):
+            value = edit.get(field)
+            if isinstance(value, str) and value.strip():
+                setattr(f, field, value.strip()[:1000])
+        for field in ("steps", "alternatives"):
+            value = edit.get(field)
+            if isinstance(value, list):
+                setattr(f, field, [str(v).strip()[:500] for v in value if str(v).strip()][:30])
+    return facts
+
+
 async def confirm_answer(
     graph: Graph,
     gap_id: str,
@@ -457,6 +476,18 @@ async def confirm_answer(
 ) -> dict[str, Any]:
     """Record a confirmed answer. For "sources disagree", `keep` is the claim the leaver named as
     current (None: neither is, or they could not say; both stay as they are)."""
+    # A double click on Confirm must not record the answer twice.
+    async with locks.hold(f"gap:{gap_id}"):
+        return await _confirm_answer(graph, gap_id, answer, facts, keep)
+
+
+async def _confirm_answer(
+    graph: Graph,
+    gap_id: str,
+    answer: str,
+    facts: list[dict[str, Any]],
+    keep: str | None,
+) -> dict[str, Any]:
     gap = await graph.one("gap_get", {"id": gap_id})
     if not gap:
         raise NotFound(gap_id)
@@ -467,19 +498,21 @@ async def confirm_answer(
         keep = handover_rules.suggest_claim(await claim_choices(graph, gap), answer)
     if gap["rule"] == "G6" and keep and keep not in (gap["target_id"], gap.get("context")):
         raise Conflict("Pick one of the two claims shown.")
-    if gap["rule"] == "G6" and keep:
-        kept = await graph.one("knowledge_get", {"id": keep})
-        if kept:
-            for item in facts:
-                item["title"] = f"Current: {kept['title']}"
     emp, now = gap["employee_id"], now_ms()
-    parsed = [Fact.model_validate(f) for f in facts]
     target = await graph.one("knowledge_get", {"id": gap["target_id"]})
     areas = (
         (target or {}).get("areas")
         or (await graph.one("node_areas", {"id": gap["target_id"]}) or {}).get("areas")
         or []
     )
+    # What is recorded comes from the gap itself (as in the preview); the leaver only edits the
+    # wording. Keys, kinds, people and SUPERSEDES links are never taken from the request.
+    parsed = with_edits(fallback_facts(gap, answer, target, areas), facts)
+    if gap["rule"] == "G6" and keep:
+        kept = await graph.one("knowledge_get", {"id": keep})
+        if kept:
+            for f in parsed:
+                f.title = f"Current: {kept['title']}"
     src = SourceIn(
         id=_id("src:answer"),
         kind="InterviewAnswer",
@@ -527,6 +560,8 @@ async def dismiss_gap(graph: Graph, gap_id: str, by: str = "", reason: str = "")
         raise NotFound(gap_id)
     if gap["rule"] == handover_rules.MANDATORY:
         raise Conflict("Company policy asks every leaver this question; it can't be dropped.")
+    if gap["status"] != "open":
+        raise Conflict("This question is already answered or was dropped.")
     await graph.run(
         "gap_dismiss", {"id": gap_id, "by": by, "now": now_ms(), "reason": reason or "dropped"}
     )
@@ -580,6 +615,14 @@ async def pending_followup(graph: Graph, h: dict[str, Any]) -> int:
 async def approve_and_transfer(
     graph: Graph, hid: str, approved_by: str, comment: str = ""
 ) -> dict[str, Any]:
+    # One approval at a time per handover: a double click must not create two transfers.
+    async with locks.hold(f"transfer:{hid}"):
+        return await _approve_and_transfer(graph, hid, approved_by, comment)
+
+
+async def _approve_and_transfer(
+    graph: Graph, hid: str, approved_by: str, comment: str
+) -> dict[str, Any]:
     preview = await transfer_preview(graph, hid)
     if not preview["ready"]:
         raise Conflict(preview["reason"])
@@ -592,6 +635,9 @@ async def approve_and_transfer(
         await check_successor(graph, h["employee_id"], h["successor_id"], confirmed=True)
     if followup and not preview["include"]:
         raise Conflict("Nothing new to hand over since the last approval.")
+    if await graph.one("successor_candidate", {"id": approved_by}) is None:
+        # Without a real approver no Approval is written and nothing would move.
+        raise Conflict("The approver must be a person in the directory.")
     now = now_ms()
     tid = _id("tr")
     await graph.run("transfer_create", {"handover": hid, "id": tid, "now": now})
@@ -703,7 +749,8 @@ async def depart(graph: Graph, hid: str) -> dict[str, Any]:
         return {"skipped": True}
     now = now_ms()
     if (h.get("effective_at") or 0) > now:
-        return {"skipped": True, "reason": "not the last day yet"}
+        # Run early (e.g. "Run now"): back in the queue for the real last day, never dropped.
+        return {"skipped": True, "reason": "not the last day yet", "requeue_at": h["effective_at"]}
     rows = await graph.run("leaver_access_end", {"emp": h["employee_id"], "now": now})
     await graph.run("employee_depart", {"id": h["employee_id"], "now": now})
     ended = rows[0]["ended"] if rows else 0

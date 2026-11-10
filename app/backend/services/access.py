@@ -301,6 +301,11 @@ def can_view_person(caller: Caller | None, emp: str) -> bool:
     return caller.id == emp or is_manager_of(caller, emp) or "hr" in caller.roles
 
 
+def can_curate_sources(caller: Caller | None) -> bool:
+    """Upload documents and decide the review queue (what enters the company memory): HR."""
+    return caller is None or "hr" in caller.roles
+
+
 def can_view_org(caller: Caller | None) -> bool:
     """Organisation-wide dashboards and KPIs."""
     if caller is None:

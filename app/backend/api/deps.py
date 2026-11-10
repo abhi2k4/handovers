@@ -5,7 +5,7 @@ from typing import Annotated
 
 from fastapi import Depends, Header, HTTPException, Request
 
-from core.clock import now_ms
+from core.clock import wall_ms
 from core.config import get_settings
 from core.graph import Graph
 from core.llm import LLM
@@ -28,6 +28,7 @@ LLMDep = Annotated[LLM, Depends(get_llm)]
 
 
 SESSION_COOKIE = "handovers_session"
+SAFE_METHODS = frozenset({"GET", "HEAD", "OPTIONS"})
 
 
 async def get_caller(
@@ -39,19 +40,23 @@ async def get_caller(
        so nobody signed in can act as someone else.
     2. Otherwise the demo "View as" header, when guests are allowed (ALLOW_GUEST, the live link for
        judges). It is not authentication.
-    3. Otherwise unrestricted (None, local development), unless sign-in is set up and guests are
-       not allowed: then the request is refused.
+    3. Otherwise unrestricted (None, local development). Once sign-in is set up, an anonymous
+       request (no session, no View-as) may only read, and only when guests are allowed: it
+       otherwise could reload the sample data, store connector secrets or approve transfers
+       by simply leaving the header out.
     """
     graph = request.app.state.graph
     token = request.cookies.get(SESSION_COOKIE)
     if token:
-        row = await graph.one("session_get", {"hash": token_hash(token), "now": now_ms()})
+        row = await graph.one("session_get", {"hash": token_hash(token), "now": wall_ms()})
         if row is not None:
             return await load_caller(graph, row["employee"])
     s = get_settings()
     if not x_view_as or not s.allow_guest:
         if s.sso_enabled and not s.allow_guest:
             raise HTTPException(401, "Sign in to continue.")
+        if s.sso_enabled and request.method not in SAFE_METHODS:
+            raise HTTPException(401, "Sign in, or pick a person in View as, to make changes.")
         return None
     caller = await load_caller(graph, x_view_as)
     if caller is None:
